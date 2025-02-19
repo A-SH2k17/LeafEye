@@ -1,4 +1,4 @@
-![Logo](https://github.com/A-SH2k17/LeafEye/tree/master/public/images/logo.png?raw=true)
+![Logo](https://github.com/user-attachments/assets/0da8417e-c907-4d93-87e0-1403b03c93b0)
 
 ## About LeafEye
 
