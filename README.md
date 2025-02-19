@@ -1,7 +1,6 @@
 ![Logo](https://github.com/user-attachments/assets/0da8417e-c907-4d93-87e0-1403b03c93b0)
 
 ## About LeafEye
-ignore
 Agriculture, crop production in particular, is an essential aspect of country’s economy. In addition to the economic benefit, crops are a vital source of food and nutrients. Thus, taking care of crop growth and prevention of possible plant diseases reduces severe costs on the country as well as increase productivity. Detection of plant disease has gained a lot of attention from researchers, and several applications have been developed to address the issue; however, many current applications available in the market struggle with disease detection and have several issues with the user-interface and user-experience. We propose a web based and mobile platform that leverages artificial intelligence techniques, specifically deep learning, for identification and classification of plant diseases. The system utilizes the powerful technological capabilities of Convolutional Neural Network to analyze 2D plant images and accurately identify the crop type as well as disease type. Our platform also provides a user-friendly experience to farmers and farming enthusiasts through our seemingly easy to use interface and several features that improve the quality of navigating through the application and facilitate them in monitoring and taking care of their personal crops.
 
 ## System Features
