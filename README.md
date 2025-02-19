@@ -1,4 +1,4 @@
-<p align="center"><a href="" target="_blank">![Logo](https://github.com/A-SH2k17/LeafEye/tree/master/public/images/logo.png?raw=true)</a></p>
+![Logo](https://github.com/A-SH2k17/LeafEye/tree/master/public/images/logo.png?raw=true)
 
 ## About LeafEye
 
