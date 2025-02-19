@@ -16,5 +16,6 @@ class Plant extends Model
 
     public function plantImage(){
         return $this->hasMany(Plant_Image::class);
+        
     }
 }
