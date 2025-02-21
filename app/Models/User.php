@@ -6,9 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\Shop;
-use App\Models\Post;
-use App\Models\Message;
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -68,5 +66,33 @@ class User extends Authenticatable
     
     public function recievedMessages(){
         return $this->hasMany(Message::class,'reciever_id');
+    }
+
+    public function chatbotInteractions(){
+        return $this->hasMany(Chatbot_Interaction::class);
+    }
+
+    public function diseaseDetection(){
+        return $this->hasMany(Disease_Detection::class);
+    }
+
+    public function fertilizerRecommendations(){
+        return $this->hasMany(Fertilizer_Recommendation::class);
+    }
+
+    public function orders(){
+        return $this->hasMany(Order::class);
+    }
+
+    public function monitors(){
+        return $this->hasMany(Plant_Monitor::class,'planted_by');
+    }
+
+    public function likes(){
+        return $this->hasMany(Like::class);
+    }
+
+    public function comments(){
+        return $this->hasMany(Comment::class);
     }
 }

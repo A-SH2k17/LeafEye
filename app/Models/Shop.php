@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
+
 
 class Shop extends Model
 {
@@ -20,5 +20,13 @@ class Shop extends Model
 
     public function user(){
         return $this->belongsTo(User::class);
+    }
+
+    public function inventory(){
+        return $this->hasOne(Inventory::class);
+    }
+
+    public function shopAdminDecision(){
+        return $this->hasOne(Admin_Shop_Decisions::class);
     }
 }

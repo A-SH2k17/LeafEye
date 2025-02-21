@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
@@ -15,4 +16,11 @@ class Product extends Model
         'price',
     ];
 
+    public function orderProductDetails(){
+        return $this->hasMany(Order_Product_Detail::class);
+    }
+
+    public function inventory(){
+        return $this->hasOne(Inventory::class);
+    }
 }

@@ -12,4 +12,12 @@ class Admin extends Model
     protected $fillable = [
         'password'
     ];
+
+    public function shopAdminDecision(){
+        return $this->hasMany(Admin_Shop_Decisions::class);
+    }
+
+    public function postDeletion(){
+        return $this->hasMany(Post_Deletion::class);
+    }
 }
