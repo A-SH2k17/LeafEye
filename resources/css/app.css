@@ -1,3 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Jockey+One&family=McLaren&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+*{
+    font-family:'Inter'
+}
+
+.introText{
+    background-color: black;
+    max-height: 50vh;
+}
+.navText{
+    font-family: 'Jockey One';
+    @apply text-lg
+}
