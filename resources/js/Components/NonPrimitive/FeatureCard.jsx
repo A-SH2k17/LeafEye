@@ -18,7 +18,7 @@ export default function FeatureCard(props){
                 <h3 className="text-xl font-bold text-gray-800">
                     {props.isAiFeatures?<Link
                                             className="text-[#A96C0B]"
-                                            href={route('dashboard')}
+                                            href={route('features_ai',{lng: props.lang})}
                                         >{t(props.title)}
                                         </Link>:t(props.title)}
                 </h3>

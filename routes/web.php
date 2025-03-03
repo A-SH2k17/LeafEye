@@ -14,6 +14,12 @@ Route::get('/', function () {
     ]);
 })->name('welcome');
 
+Route::get('/ai_features',function(){
+    return Inertia::render('AiFeatures');
+})->name('features_ai');
+
+
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

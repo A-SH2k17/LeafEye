@@ -9,7 +9,7 @@ import Register from "@/Pages/Auth/Register";
 import { useTranslation } from "react-i18next";
 import "../../i18n.js"
 
-export default function Navbar({user}){
+export default function Navbar({lang,user}){
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
@@ -21,7 +21,7 @@ export default function Navbar({user}){
                     <div className="flex h-16 justify-between">
                         <div className="flex">
                             <div className="flex shrink-0 items-center bg-zinc-50  p-2">
-                                <Link href="/">
+                                <Link href={`/?lng=${lang}`}>
                                     <ApplicationLogo className="block h-full w-auto fill-current" />
                                 </Link>
                             </div>
@@ -127,6 +127,8 @@ export default function Navbar({user}){
                             }
                         </div>
 
+
+                        {/**Starting from here is the responsive link for small screens */}
                         <div className="-me-2 flex items-center sm:hidden">
                             <button
                                 onClick={() =>
