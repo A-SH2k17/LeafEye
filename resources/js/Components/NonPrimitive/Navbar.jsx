@@ -6,19 +6,23 @@ import ResponsiveNavLink from '@/Components/Primitive/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import PrimaryButton from "../Primitive/PrimaryButton";
 import Register from "@/Pages/Auth/Register";
+import { useTranslation } from "react-i18next";
+import "../../i18n.js"
 
 export default function Navbar({user}){
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
 
+    const { t } = useTranslation();
+
     return(
-        <nav className="border-b border-gray-100 bg-leaf-nav-back">
+        <nav className="border-b border-gray-100 bg-leaf-nav-back md:p-0 sm:pb-3">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
                         <div className="flex">
                             <div className="flex shrink-0 items-center bg-zinc-50  p-2">
                                 <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current" />
+                                    <ApplicationLogo className="block h-full w-auto fill-current" />
                                 </Link>
                             </div>
                         </div>
@@ -29,7 +33,7 @@ export default function Navbar({user}){
                                         href={route('dashboard')}
                                         active={route().current('dashboard') || route().current('welcome')}
                                     >
-                                        Home
+                                        {t("home_link")}
                                     </NavLink>
                                     {
                                         user && (<NavLink
@@ -37,7 +41,7 @@ export default function Navbar({user}){
                                             href={route('dashboard')}
                                             active={route().current('d')}
                                         >
-                                        Feed
+                                        {t("social_media")}
                                         </NavLink>)
                                     }
                                     <NavLink
@@ -45,7 +49,7 @@ export default function Navbar({user}){
                                         href={route('dashboard')}
                                         active={route().current('d')}
                                     >
-                                        Marketplace
+                                        {t("market")}
                                     </NavLink>
                             </div>
                         </div>
@@ -59,7 +63,7 @@ export default function Navbar({user}){
                                             href={route('dashboard')}
                                             active={route().current('d')}
                                         >
-                                            Chat with LeafEye
+                                            {t("chatbot")}
                                     </NavLink>
                                 </div>
                                 <div className="relative ms-3">
@@ -92,14 +96,14 @@ export default function Navbar({user}){
                                             <Dropdown.Link
                                                 href={route('profile.edit')}
                                             >
-                                                Profile
+                                                {t("profile")}
                                             </Dropdown.Link>
                                             <Dropdown.Link
                                                 href={route('logout')}
                                                 method="post"
                                                 as="button"
                                             >
-                                                Log Out
+                                                {t("logout")}
                                             </Dropdown.Link>
                                         </Dropdown.Content>
                                     </Dropdown>
@@ -111,10 +115,12 @@ export default function Navbar({user}){
                                 user==null && (
                                     <>
                                     <div className="p-3">
-                                        <PrimaryButton className="mr-4">
-                                            <Link href={route('register')}>Register</Link>
-                                        </PrimaryButton>
-                                        <PrimaryButton><Link href={route('login')}>Log In</Link></PrimaryButton>
+                                        <Link href={route('register')}>
+                                            <PrimaryButton className="mr-4">{t("register")}</PrimaryButton>
+                                        </Link>
+                                        <Link href={route('login')}>
+                                            <PrimaryButton>{t("login")}</PrimaryButton>
+                                        </Link>
                                     </div>
                                     </>
                                 )
@@ -177,20 +183,21 @@ export default function Navbar({user}){
                             href={route('dashboard')}
                             active={route().current('dashboard') || route().current('welcome')}
                         >
-                            Home
+                            {t("home_link")}
                         </ResponsiveNavLink>
+                        {
+                            user && 
+                            <ResponsiveNavLink
+                            href={route('dashboard')}
+                            active={route().current('a')}>
+                                {t("social_media")}
+                            </ResponsiveNavLink>
+                        }
                         <ResponsiveNavLink
-        
                             href={route('dashboard')}
                             active={route().current('a')}
                         >
-                            Feed
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('a')}
-                        >
-                            Marketplace
+                            {t("market")}
                         </ResponsiveNavLink>
                     </div>
 
@@ -202,14 +209,14 @@ export default function Navbar({user}){
                                 </div>
                                 <div className="mt-3 space-y-1">
                                     <ResponsiveNavLink href={route('profile.edit')}>
-                                        Profile
+                                        {t("profile")}
                                     </ResponsiveNavLink>
                                     <ResponsiveNavLink
                                         method="post"
                                         href={route('logout')}
                                         as="button"
                                     >
-                                        Log Out
+                                        {t("logout")}
                                     </ResponsiveNavLink>
                                 </div>
                             </div>
@@ -221,12 +228,12 @@ export default function Navbar({user}){
                             <div className="border-t border-gray-200 pb-1 pt-4">
                                 <div className="mt-3 space-y-1">
                                     <ResponsiveNavLink href={route('login')}>
-                                        Login
+                                        {t("login")}
                                     </ResponsiveNavLink>
                                     <ResponsiveNavLink
                                         href={route('register')}
                                     >
-                                        Register
+                                        {t("register")}
                                     </ResponsiveNavLink>
                                 </div>
                             </div>

@@ -9,11 +9,22 @@
     font-family:'Inter'
 }
 
-.introText{
-    background-color: black;
-    max-height: 50vh;
-}
+
 .navText{
     font-family: 'Jockey One';
-    @apply text-lg
+    @apply md:text-lg sm:text-base
+}
+
+.featuresSection{
+    background: rgb(201,225,177);
+    background: linear-gradient(180deg, rgba(201,225,177,1) 0%, rgba(166,197,167,1) 100%); 
+}
+
+.featuresSection2{
+    background: rgb(201,225,177);
+    background: linear-gradient(0deg, rgba(201,225,177,1) 0%, rgba(166,197,167,1) 100%); 
+}
+
+.featuresTitle{
+    background-color: red;
 }
