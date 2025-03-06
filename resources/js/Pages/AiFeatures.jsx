@@ -4,41 +4,14 @@ import { Head } from "@inertiajs/react";
 import React from "react";
 import { useEffect,useState } from "react";
 import { useTranslation } from "react-i18next";
-
+import { useLanguage } from "@/multilanguage";
 
 export default function AiFeatures(){
 
 
     //multilanguage code
-    const [lang, setLang] = useState(localStorage.getItem("selectedLang") || "en");
-    const languages = [
-        { value: "", text: "Options" },
-        { value: "en", text: "English" },
-        { value: "ar", text: "Arabic" },
-        { value: "es", text: "Español" },
-        { value: "de", text: "Deutsch" },
-    ];
-
-    const { t } = useTranslation();
-
-    useEffect(() => {
-        // Apply language from localStorage on first load
-        let params = new URLSearchParams(window.location.search);
-        const urlLang = params.get("lng");
-
-        if (urlLang) {
-            setLang(urlLang);
-            localStorage.setItem("selectedLang", urlLang);
-        }
-    }, []);
-
-    const handleChange = (e) => {
-        setLang(e.target.value);
-        let loc = "http://leafeye.test/ai_features";
-        window.location.replace(
-            loc + "?lng=" + e.target.value
-        );
-    };
+    const {lang,handleChange,languages} = useLanguage();
+    const {t} = useTranslation();
 
     return(
         <>

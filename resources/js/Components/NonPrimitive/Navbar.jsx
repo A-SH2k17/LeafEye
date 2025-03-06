@@ -30,15 +30,15 @@ export default function Navbar({lang,user}){
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex sm:mt-3 ">
                                     <NavLink
                                         className="navText"
-                                        href={route('dashboard')}
-                                        active={route().current('dashboard') || route().current('welcome')}
+                                        href={route('users_home',{lng:lang})}
+                                        active={route().current('users_home') || route().current('welcome')}
                                     >
                                         {t("home_link")}
                                     </NavLink>
                                     {
                                         user && (<NavLink
                                             className="navText"
-                                            href={route('dashboard')}
+                                            href={route('users_home')}
                                             active={route().current('d')}
                                         >
                                         {t("social_media")}
@@ -46,7 +46,7 @@ export default function Navbar({lang,user}){
                                     }
                                     <NavLink
                                         className="navText"
-                                        href={route('dashboard')}
+                                        href={route('users_home')}
                                         active={route().current('d')}
                                     >
                                         {t("market")}
@@ -60,7 +60,7 @@ export default function Navbar({lang,user}){
                                 <div >
                                     <NavLink
                                             className="navText"
-                                            href={route('dashboard')}
+                                            href={route('users_home')}
                                             active={route().current('d')}
                                         >
                                             {t("chatbot")}
@@ -182,21 +182,21 @@ export default function Navbar({lang,user}){
                                         
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard') || route().current('welcome')}
+                            href={route('users_home')}
+                            active={route().current('users_home') || route().current('welcome')}
                         >
                             {t("home_link")}
                         </ResponsiveNavLink>
                         {
                             user && 
                             <ResponsiveNavLink
-                            href={route('dashboard')}
+                            href={route('users_home')}
                             active={route().current('a')}>
                                 {t("social_media")}
                             </ResponsiveNavLink>
                         }
                         <ResponsiveNavLink
-                            href={route('dashboard')}
+                            href={route('users_home')}
                             active={route().current('a')}
                         >
                             {t("market")}

@@ -1,6 +1,6 @@
 import ClientCard from '@/Components/NonPrimitive/ClientCard';
 import UnauthenticatedLayout from '@/Layouts/UnauthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head} from '@inertiajs/react';
 import customers from '@/dummyJson/customersJson';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef } from 'react';
@@ -8,39 +8,13 @@ import '../i18n.js';
 import FeatureCard from '@/Components/NonPrimitive/FeatureCard.jsx';
 import features from '@/dummyJson/features.jsx';
 import Footer from '@/Components/NonPrimitive/Footer.jsx';
+import { useLanguage } from '@/multilanguage.js';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
-    // multilanguage code
-    const languages = [
-        { value: "", text: "Options" },
-        { value: "en", text: "English" },
-        { value: "ar", text: "Arabic" },
-        { value: "es", text: "Español" },
-        { value: "de", text: "Deutsch" },
-    ];
-    const { t } = useTranslation();
-
-    const [lang, setLang] = useState(localStorage.getItem("selectedLang") || "en");
-
-    useEffect(() => {
-        // Apply language from localStorage on first load
-        let params = new URLSearchParams(window.location.search);
-        const urlLang = params.get("lng");
-
-        if (urlLang) {
-            setLang(urlLang);
-            localStorage.setItem("selectedLang", urlLang);
-        }
-    }, []);
-
-    const handleChange = (e) => {
-        setLang(e.target.value);
-        let loc = "http://leafeye.test/";
-        window.location.replace(
-            loc + "?lng=" + e.target.value
-        );
-    };
-
+   
+    
+    const {lang,handleChange,languages} = useLanguage();
+    const {t} = useTranslation();
     // Responsive carousel code
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
