@@ -20,7 +20,7 @@
     background: linear-gradient(180deg, rgba(201,225,177,1) 0%, rgba(166,197,167,1) 100%); 
 }
 
-.featuresSection2{
+.featuresSection2,.diseaseDetection{
     background: rgb(201,225,177);
     background: linear-gradient(0deg, rgba(201,225,177,1) 0%, rgba(166,197,167,1) 100%); 
 }
