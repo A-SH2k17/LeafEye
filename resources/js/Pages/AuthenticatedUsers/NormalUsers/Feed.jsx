@@ -4,6 +4,7 @@ import { useLanguage } from "@/multilanguage";
 import { useTranslation } from "react-i18next";
 import { Head } from "@inertiajs/react";
 import PostCreation from "@/Components/NonPrimitive/PostCreation";
+import Test from "@/Components/NonPrimitive/test";
 
 export default function Feed(){
     const {lang,handleChange,languages} = useLanguage();
@@ -25,8 +26,17 @@ export default function Feed(){
                         );
                     })}
                 </select>
+                {/**post creation section */}
                 <PostCreation/>
+                <Test/>
+                ggggggg
+                gggjgrsgter
+                
+
+
             </AuthenticatedLayout>
+
+
         </>
     )
 }
