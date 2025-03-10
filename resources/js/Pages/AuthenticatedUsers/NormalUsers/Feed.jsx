@@ -3,6 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useLanguage } from "@/multilanguage";
 import { useTranslation } from "react-i18next";
 import { Head } from "@inertiajs/react";
+import PostCreation from "@/Components/NonPrimitive/PostCreation";
 
 export default function Feed(){
     const {lang,handleChange,languages} = useLanguage();
@@ -24,9 +25,8 @@ export default function Feed(){
                         );
                     })}
                 </select>
+                <PostCreation/>
             </AuthenticatedLayout>
-
-
         </>
     )
 }
