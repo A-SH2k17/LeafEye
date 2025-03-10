@@ -38,8 +38,8 @@ export default function Navbar({lang,user}){
                                     {
                                         user && (<NavLink
                                             className="navText"
-                                            href={route('users_home')}
-                                            active={route().current('d')}
+                                            href={route('feed.index')}
+                                            active={route().current('feed.index')}
                                         >
                                         {t("social_media")}
                                         </NavLink>)
@@ -190,8 +190,8 @@ export default function Navbar({lang,user}){
                         {
                             user && 
                             <ResponsiveNavLink
-                            href={route('users_home')}
-                            active={route().current('a')}>
+                            href={route('feed.index')}
+                            active={route().current('feed.index')}>
                                 {t("social_media")}
                             </ResponsiveNavLink>
                         }
