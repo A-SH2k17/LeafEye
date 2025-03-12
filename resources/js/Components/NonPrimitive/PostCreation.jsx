@@ -78,8 +78,8 @@ export default function PostCreation(props) {
     };
 
     return (
-        <div className="bg-[#ade2b7] p-4 rounded-2xl max-w-xl my-4">
-            <div className="bg-white rounded-xl p-4 shadow-sm">
+        <div className="bg-[#e8fcef] shadow-green-300 shadow-md p-4 rounded-2xl max-w-xl my-4">
+            <div className="bg-gray-50 rounded-xl p-4 shadow-sm">
                 <div className="flex items-center mb-4">
                     <div className="relative">
                         <img 
