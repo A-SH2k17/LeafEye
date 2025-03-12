@@ -71,19 +71,18 @@ export default function PostCreation(props) {
       
     const removeImage = () => {
         setSelectedImage(null);
-        setSelectedImageType(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
     };
 
     return (
-        <div className="bg-[#e8fcef] shadow-green-300 shadow-md p-4 rounded-2xl max-w-xl my-4">
+        <div className="bg-[#e8fcef] hover:shadow-green-300 shadow-md p-4 rounded-2xl max-w-xl my-4">
             <div className="bg-gray-50 rounded-xl p-4 shadow-sm">
                 <div className="flex items-center mb-4">
                     <div className="relative">
                         <img 
-                            src="images/Welcome/cust.jpg" 
+                            src="/images/Welcome/cust.jpg" 
                             alt="Profile Avatar" 
                             className="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
                         />

@@ -32,8 +32,9 @@ Route::middleware('auth')->group(function () {
 });
 // routes feed
 Route::middleware('auth')->controller(FeedController::class)->group(function(){
-    Route::get('/feed', 'index')->name('feed.index');
+    Route::get('/feed/{user}', 'index')->name('feed.index');
     Route::post('/post','store')->name('feed.post');
+    Route::post('/feed/{user}/{post}/like','like')->name('feed.user_like');
     Route::get('/getPosts','retrievePosts')->name('feed.getPosts');
 });
 

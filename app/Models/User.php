@@ -95,4 +95,24 @@ class User extends Authenticatable
     public function comments(){
         return $this->hasMany(Comment::class);
     }
+
+    public function followers()
+    {
+        return $this->hasMany(Follow::class, 'user');
+    }
+
+    public function followings()
+    {
+        return $this->hasMany(Follow::class, 'followed_by');
+    }
+
+    public function followerUsers()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'user', 'followed_by');
+    }
+
+    public function followingUsers()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'followed_by', 'user');
+    }
 }
