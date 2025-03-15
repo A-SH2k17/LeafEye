@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
 class Follow extends Model
 {
@@ -12,7 +13,7 @@ class Follow extends Model
         'user',
         'followed_by',
     ];
-    use HasFactory;
+    use HasFactory,HasApiTokens;
 
     public function followee()
     {

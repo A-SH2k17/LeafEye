@@ -35,6 +35,7 @@ export default function PostCreation(props) {
         router.post('/post', formData, {
             forceFormData: true,
             onSuccess: () => {
+                
                 // Reset form after successful submission
                 setPostText('');
                 setSelectedImage(null);
@@ -43,6 +44,7 @@ export default function PostCreation(props) {
                     fileInputRef.current.value = '';
                 }
                 setIsSubmitting(false);
+                props.onPostCreated();
             },
             onError: (errors) => {
                 alert(errors)

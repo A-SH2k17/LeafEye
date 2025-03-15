@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Laravel\Sanctum\HasApiTokens;
 
 class Shop extends Model
 {
     /** @use HasFactory<\Database\Factories\ShopFactory> */
-    use HasFactory;
+    use HasFactory,HasApiTokens;
     protected $fillable = [
         'commercial_registration',
         'name',

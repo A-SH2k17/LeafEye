@@ -9,6 +9,38 @@ import Footer from '@/Components/NonPrimitive/Footer';
 
 export default function Dashboard() {
 
+
+    //code to save csrf and beareer token to avoid the 419 and 401 error in post
+    useEffect(() => {
+        // Extract CSRF token from URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("csrfToken");
+        const bearer = params.get("bearer_token");
+
+        if (token) {
+            localStorage.setItem("csrf_token", token); // Save to localStorage
+            //setCsrfToken(token); // Update state
+            console.log("CSRF Token saved:", token);
+
+            // Remove csrfToken from URL
+            params.delete("csrfToken");
+            const newUrl = window.location.pathname + (params.toString() ? "?" + params.toString() : "");
+            window.history.replaceState({}, "", newUrl);
+        }
+
+        if(bearer){
+            localStorage.setItem("bearer_token", bearer); // Save to localStorage
+            //setCsrfToken(token); // Update state
+            console.log("Bearer Token saved:", bearer);
+
+            // Remove csrfToken from URL
+            params.delete("bearer_token");
+            const newUrl = window.location.pathname + (params.toString() ? "?" + params.toString() : "");
+            window.history.replaceState({}, "", newUrl);
+        }
+    }, []);
+
+
     //multilangiage code
     const {lang,handleChange,languages} = useLanguage();
     const {t} = useTranslation();

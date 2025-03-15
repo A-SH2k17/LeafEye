@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Follow;
 use App\Models\Like;
 use Exception;
 use Illuminate\Http\Request;
@@ -15,12 +16,11 @@ class FeedController extends Controller
 {
     function index($user){
         $user_id = Auth::user()->id;
-        $posts = $this->retrievePosts($user_id);
+        $posts = $this->retrievePosts($user_id, 1, 3); // Initial load with first 3 posts
         return Inertia::render('AuthenticatedUsers/NormalUsers/Feed',['posts'=>$posts]);
     }
 
     function store(Request $request){
-        
         try{
             $user = User::where('username',$request->username)->first();
 
@@ -30,8 +30,6 @@ class FeedController extends Controller
                 $imagePath = $request->file('image')->store('uploads', 'public'); // Store in storage/app/public/uploads
             }
             
-            //return $request->hasFile('image');
-            //return $imagePath==null?"yes":"no";
             Post::create([
                 'user_id' => $user->id,
                 'image_path' => $imagePath,
@@ -44,10 +42,17 @@ class FeedController extends Controller
         }
     }
 
-    function retrievePosts($active_user_id){
-        $posts = Post::orderBy('created_at','desc')->get();
-        if (!$posts){
-            return response()->json(['error'=>"No Posts Found"],404);
+    // Updated to support pagination
+    function retrievePosts($active_user_id, $page = 1, $limit = 3){
+        $offset = ($page - 1) * $limit;
+        
+        $posts = Post::orderBy('created_at','desc')
+                    ->skip($offset)
+                    ->take($limit)
+                    ->get();
+                    
+        if ($posts->isEmpty() && $page === 1){
+            return response()->json(['error'=>"No Posts Found"], 404);
         }
 
         try{
@@ -59,19 +64,58 @@ class FeedController extends Controller
                 $user_liked = $check > 0;
                 $like_counts = count(Like::where('post_id',$post->id)->get());
                 $comment_counts = count(Comment::where('post_id',$post->id)->get());
-                array_push($posts_output,["post_id"=>$post->id,"post_user"=>$username,"post_image"=>$imageUrl,"post_description"=>$post->description, "liked_by_user"=>$user_liked, "like_counts"=>$like_counts, "comment_counts"=>$comment_counts]);
+                $user_followed = Follow::where('user',$post->user_id)->where('followed_by',$active_user_id)->exists();
+
+                $comments_out = [];
+                $comments = $post->comments()->get();
+
+                foreach($comments as $comment){
+                    $commenter = User::find($comment->commented_by)->username;
+                    array_push($comments_out,['commenter'=>$commenter,"content"=>$comment->content]);
+                }
+
+                array_push($posts_output,[
+                    "post_id" => $post->id,
+                    "post_user" => $username,
+                    "post_image" => $imageUrl,
+                    "post_description" => $post->description, 
+                    "liked_by_user" => $user_liked, 
+                    "like_counts" => $like_counts, 
+                    "comment_counts" => $comment_counts,
+                    "user_followed" => $user_followed,
+                    'user_id' => $post->user_id,
+                    "comments" => $comments_out
+                ]);
             }
+            
+            // Get total count for pagination info
+            $total_posts = Post::count();
+            $has_more = ($offset + $limit) < $total_posts;
             
             return response()->json([
                 'posts' => $posts_output,
+                'pagination' => [
+                    'current_page' => $page,
+                    'limit' => $limit,
+                    'total' => $total_posts,
+                    'has_more' => $has_more
+                ]
             ]);
         } catch(Exception $e){
             return response()->json([
-                'error'=>$e->getMessage(),
-            ],500);
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
+    // API endpoint for fetching paginated posts
+    public function getPaginatedPosts(Request $request) {
+        $user_id = Auth::user()->id;
+        $page = $request->query('page', 1);
+        $limit = $request->query('limit', 3);
+        
+        return $this->retrievePosts($user_id, $page, $limit);
+    }
 
     function like($user_id, $post_id){
         try {
@@ -100,6 +144,54 @@ class FeedController extends Controller
             return response()->json([
                 'error' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    function comment($user_id,$post_id,$content){
+        try{
+            Comment::create([
+                'post_id'=>$post_id,
+                'commented_by'=>$user_id,
+                'content'=>$content,
+                'date_commented'=>now()
+            ]);
+
+            $comment_counts = Comment::where('post_id', $post_id)->count();
+            return response()->json([
+                'success'=>true,
+                'message'=>'Comment Posted Successfully',
+                'comment'=>['commenter'=>User::find($user_id)->username,"content"=>$content],
+                'comments_count' => $comment_counts,
+            ]);
+        }catch(Exception $e){
+            return response()->json([
+                'error'=> $e->getMessage(),
+            ],500);
+        }
+    }
+
+    function follow($followed_id,$follower_id){
+        try{
+            $existing_follow = Follow::where('user',$followed_id)->where('followed_by',$follower_id)->first();
+            $followed=false;
+            if($existing_follow){
+                $existing_follow->delete();
+            }else{
+                Follow::create([
+                    'user'=>$followed_id,
+                    'followed_by'=>$follower_id,
+                ]);
+                $followed=true;
+            }
+            return response()->json([
+                'success'=>true,
+                'message'=>'Follow done Successfully',
+                'followed'=>$followed,
+            ]);
+        }catch(Exception $e){
+            return response()->json([
+                'error'=> $e->getMessage(),
+            ],500);
         }
     }
 }

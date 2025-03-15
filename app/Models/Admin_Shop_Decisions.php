@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
 class Admin_Shop_Decisions extends Model
 {
     /** @use HasFactory<\Database\Factories\AdminShopDecisionsFactory> */
-    use HasFactory;
+    use HasFactory,HasApiTokens;
     protected $fillable = [
         'admin_id',
         'shop_id',

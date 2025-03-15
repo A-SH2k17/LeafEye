@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens,HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -106,13 +107,14 @@ class User extends Authenticatable
         return $this->hasMany(Follow::class, 'followed_by');
     }
 
-    public function followerUsers()
-    {
-        return $this->belongsToMany(User::class, 'follows', 'user', 'followed_by');
-    }
+    
+    // public function followerUsers()
+    // {
+    //     return $this->belongsToMany(User::class, 'follows', 'user', 'followed_by');
+    // }
 
-    public function followingUsers()
-    {
-        return $this->belongsToMany(User::class, 'follows', 'followed_by', 'user');
-    }
+    // public function followingUsers()
+    // {
+    //     return $this->belongsToMany(User::class, 'follows', 'followed_by', 'user');
+    // }
 }

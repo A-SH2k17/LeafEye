@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Laravel\Sanctum\HasApiTokens;
 
 class Chatbot_Interaction extends Model
 {
     /** @use HasFactory<\Database\Factories\ChatbotInteractionFactory> */
-    use HasFactory;
+    use HasFactory, HasApiTokens;
 
     protected $fillable=[
         'content',

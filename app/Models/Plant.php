@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-
+use Laravel\Sanctum\HasApiTokens;
 
 class Plant extends Model
 {
     /** @use HasFactory<\Database\Factories\PlantFactory> */
-    use HasFactory;
+    use HasFactory,HasApiTokens;
     protected $fillable = [
         'plant_type'
     ];

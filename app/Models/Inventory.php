@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Laravel\Sanctum\HasApiTokens;
 
 class Inventory extends Model
 {
     /** @use HasFactory<\Database\Factories\InventoryFactory> */
-    use HasFactory;
+    use HasFactory, HasApiTokens;
 
     protected $fillable=[
         'shop_id',
