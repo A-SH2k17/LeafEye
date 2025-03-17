@@ -8,7 +8,7 @@ export default function Footer({lang}){
             <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-center md:text-left">
                 {/* Logo & Slogan */}
                 <div>
-                <img src="images/logo.png" alt="Leaf-EYE Logo" className="w-16 sm:w-20 md:w-24 lg:w-28 xl:w-32 mx-auto md:mx-0" />
+                <img src="/images/logo.png" alt="Leaf-EYE Logo" className="w-16 sm:w-20 md:w-24 lg:w-28 xl:w-32 mx-auto md:mx-0" />
                 <h2 className="font-bold text-lg mt-2">{t("slogan")}</h2>
                 </div>
                 

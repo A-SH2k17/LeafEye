@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\NormalUser\FollowerController;
 
 // Authentication routes
 Route::get('/test_authenticated',function(){
@@ -19,4 +20,6 @@ Route::get('/test',function(){
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/posts', [App\Http\Controllers\FeedController::class, 'getPaginatedPosts']);
+    Route::post('/feed/{user}/{followed_by}/like',[App\Http\Controllers\FeedController::class, 'like']);
+    Route::post('/feed/{user}/{post}/follow',[FollowerController::class, 'follow']);
 });

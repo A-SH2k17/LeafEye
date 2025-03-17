@@ -3,42 +3,39 @@ import PrimaryButton from "../Primitive/PrimaryButton";
 import { Heart, MessageSquare, X } from 'lucide-react';
 import { router } from "@inertiajs/react";
 import { useState } from "react";
-import { use } from "i18next";
 
 export default function PostCard(props){
-    const [likeCounts,setLikeCounts] = useState(props.post.like_counts)
-    const [commentCounts,setCommentCounts] = useState(props.post.comment_counts)
-    const [likedByUser,setLikedByUser] = useState(props.post.liked_by_user)
+    const [likeCounts, setLikeCounts] = useState(props.post.like_counts)
+    const [commentCounts, setCommentCounts] = useState(props.post.comment_counts)
+    const [likedByUser, setLikedByUser] = useState(props.post.liked_by_user)
     const [error, setError] = useState(null);
-    const [followed,setFollow] = useState(props.post.user_followed);
-    const [commentActive,setCommentActive] = useState(false);
-    const [comments,setCommetns] = useState(props.post.comments||[])
-    const [userComment,setUserComment] = useState(null)
-    //follow api request
-    const folllowSwitch = () =>{
-        fetch(route("feed.user_follow",{user:props.post.user_id,followed_by:props.active_user_id}), {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": localStorage.getItem("csrf_token")
-            },
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            setFollow(data.followed);
-        })
-        .catch((error) => console.error("Error:", error));
+    const [followed, setFollow] = useState(props.post.user_followed);
+    const [commentActive, setCommentActive] = useState(false);
+    const [comments, setComments] = useState(props.post.comments || [])
+    const [userComment, setUserComment] = useState("")
+    
+    // Use the parent component's follow handler
+    const followSwitch = () => {
+        if (props.onFollowToggle) {
+            props.onFollowToggle(props.post.user_id);
+            // Update local state to reflect change immediately
+            setFollow(!followed);
+        }
     }
 
+    // Update followed state when props change
+    React.useEffect(() => {
+        setFollow(props.post.user_followed);
+    }, [props.post.user_followed]);
 
     //comment button activation
-    const commentSwitch = ()=>{
+    const commentSwitch = () => {
         setCommentActive(!commentActive);
-        console.log(comments)
     }
+    
     //like api requuest
     const likeSwitch = () => {
-        fetch(route("feed.user_like",{user:props.active_user_id,post:props.post.post_id}), {
+        fetch(route("feed.user_like", {user: props.active_user_id, post: props.post.post_id}), {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -60,7 +57,9 @@ export default function PostCard(props){
     
     //comment api request
     const handleComment = () => {
-        fetch(route("feed.user_comment",{user:props.active_user_id,post:props.post.post_id,content:userComment}), {
+        if (!userComment || userComment.trim() === "") return;
+        
+        fetch(route("feed.user_comment", {user: props.active_user_id, post: props.post.post_id, content: userComment}), {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -70,17 +69,18 @@ export default function PostCard(props){
         .then((response) => response.json())
         .then((data) => {
             setCommentCounts(data.comments_count);
-            setCommetns(prev => [...prev,data.comment])
+            setComments(prev => [...prev, data.comment]);
             setUserComment("");
         })
         .catch((error) => console.error("Error:", error));
     };
     
-    const updateUserComment = (e)=>{
+    const updateUserComment = (e) => {
         setUserComment(e.target.value);
     }
+    
     return(
-        <div className="p-4  rounded-lg shadow-xl my-3 max-w-xl bg-[#e8fcef]">
+        <div className="p-4 rounded-lg shadow-xl my-3 max-w-xl bg-[#e8fcef]">
             <div className="flex items-center">
                 <div className="relative">
                     <img 
@@ -90,21 +90,21 @@ export default function PostCard(props){
                     />
                 </div>
                 <span className="mx-3 text-lg text-gray-600 font-medium">{props.post.post_user}</span>
-                {props.active_username!=props.post.post_user&&
-                <PrimaryButton onClick={folllowSwitch}>{followed?"Unfollow":"Follow"}</PrimaryButton>}
+                {props.active_username != props.post.post_user &&
+                <PrimaryButton onClick={followSwitch}>{followed ? "Unfollow" : "Follow"}</PrimaryButton>}
             </div>
             {
                 props.post.post_image &&
                 <img 
-                        src={props.post.post_image} 
-                        alt="Profile Avatar" 
-                        className="w-3/4 mt-2 mb-4 mx-auto"
+                    src={props.post.post_image} 
+                    alt="Profile Avatar" 
+                    className="w-3/4 mt-2 mb-4 mx-auto"
                 />
             }
             <div className="p-4 bg-[#fafcff] rounded-md m-2">
                 <div className="flex items-center space-x-4 text-sm mb-2">
                     <div className="flex items-center">
-                    <Heart size={16} className="mr-1 text-black active:scale-125" fill={likedByUser?"red":"white"} onClick={likeSwitch}/>
+                    <Heart size={16} className="mr-1 text-black active:scale-125" fill={likedByUser ? "red" : "white"} onClick={likeSwitch}/>
                     <span>{likeCounts}</span>
                     </div>
                     <div className="flex items-center">
@@ -119,7 +119,7 @@ export default function PostCard(props){
                 </div>
                 
                 <div className="text-xs text-gray-500">
-                    Posted 4 Days Ago
+                    Posted {props.post.posted_since}
                 </div>
             </div>
 

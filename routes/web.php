@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\NormalUser\FollowerController;
+use App\Http\Controllers\NormalUser\MessagesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -36,8 +38,18 @@ Route::middleware('auth')->controller(FeedController::class)->group(function(){
     Route::post('/post','store')->name('feed.post');
     Route::post('/feed/{user}/{post}/like','like')->name('feed.user_like');
     Route::post('/feed/{user}/{post}/{content}/comment','comment')->name('feed.user_comment');
-    Route::post('/feed/{user}/{followed_by}/follow','follow')->name('feed.user_follow');
     Route::get('/getPosts','retrievePosts')->name('feed.getPosts');
 });
 
+
+//routes messages
+Route::middleware('auth')->controller(MessagesController::class)->group(function(){
+    Route::get('/messages/{user}','retrieveMessages')->name('message.retrieve');
+});
+
+//routes of following and follower
+Route::middleware('auth')->controller(FollowerController::class)->group(function(){
+    Route::post('/feed/{user}/{followed_by}/follow','follow')->name('feed.user_follow');
+    Route::get('/follows/{user}','retrieveFollowers')->name('followers.retrieve');
+});
 require __DIR__.'/auth.php';

@@ -16,7 +16,7 @@ export default function Navbar({lang,user}){
     const { t } = useTranslation();
 
     return(
-        <nav className="border-b border-gray-100 bg-leaf-nav-back md:p-0 sm:pb-3">
+        <nav className="border-b border-gray-100 bg-leaf-nav-back md:p-0 sm:pb-3 fixed w-full z-[2]">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
                         <div className="flex">

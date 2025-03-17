@@ -94,7 +94,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             <UnauthenticatedLayout
                 lang = {lang}
             >
-                <select value={lang} onChange={handleChange} className='m-4'>
+                <select value={lang} onChange={handleChange} className='m-4 mt-20'>
                     {languages.map((item) => {
                         return (
                             <option

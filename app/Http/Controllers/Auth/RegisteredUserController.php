@@ -55,6 +55,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('users_home', ['csrfToken' => csrf_token()] ,absolute: false));
+        return redirect(route('users_home', ['csrfToken' => csrf_token(),"bearer_token"=>$user->createToken(time())->plainTextToken],absolute: false));
     }
 }

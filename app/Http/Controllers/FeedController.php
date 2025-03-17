@@ -15,12 +15,18 @@ use Illuminate\Support\Facades\Auth;
 class FeedController extends Controller
 {
     function index($user){
+        /**
+         * This function returns the index page of the social media feed
+         */
         $user_id = Auth::user()->id;
         $posts = $this->retrievePosts($user_id, 1, 3); // Initial load with first 3 posts
         return Inertia::render('AuthenticatedUsers/NormalUsers/Feed',['posts'=>$posts]);
     }
 
     function store(Request $request){
+        /**
+         * This function stores the post inputed by the user
+         */
         try{
             $user = User::where('username',$request->username)->first();
 
@@ -84,7 +90,8 @@ class FeedController extends Controller
                     "comment_counts" => $comment_counts,
                     "user_followed" => $user_followed,
                     'user_id' => $post->user_id,
-                    "comments" => $comments_out
+                    "comments" => $comments_out,
+                    "posted_since"=>$post->created_at->diffForHumans()
                 ]);
             }
             
@@ -118,6 +125,7 @@ class FeedController extends Controller
     }
 
     function like($user_id, $post_id){
+        /**This function adds a like record in the datrabase */
         try {
             $existingLike = Like::where('liked_by', $user_id)
                                ->where('post_id', $post_id)
@@ -162,31 +170,6 @@ class FeedController extends Controller
                 'message'=>'Comment Posted Successfully',
                 'comment'=>['commenter'=>User::find($user_id)->username,"content"=>$content],
                 'comments_count' => $comment_counts,
-            ]);
-        }catch(Exception $e){
-            return response()->json([
-                'error'=> $e->getMessage(),
-            ],500);
-        }
-    }
-
-    function follow($followed_id,$follower_id){
-        try{
-            $existing_follow = Follow::where('user',$followed_id)->where('followed_by',$follower_id)->first();
-            $followed=false;
-            if($existing_follow){
-                $existing_follow->delete();
-            }else{
-                Follow::create([
-                    'user'=>$followed_id,
-                    'followed_by'=>$follower_id,
-                ]);
-                $followed=true;
-            }
-            return response()->json([
-                'success'=>true,
-                'message'=>'Follow done Successfully',
-                'followed'=>$followed,
             ]);
         }catch(Exception $e){
             return response()->json([

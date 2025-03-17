@@ -100,7 +100,7 @@ export default function Dashboard() {
         <AuthenticatedLayout
             lang={lang}>
             <Head title={t("home_link")} />
-            <select value={lang} onChange={handleChange} className='m-4'>
+            <select value={lang} onChange={handleChange} className='m-4 mt-20'>
                     {languages.map((item) => {
                         return (
                             <option

@@ -8,6 +8,9 @@ import Footer from "@/Components/NonPrimitive/Footer";
 import PrimaryButton from "@/Components/Primitive/PrimaryButton";
 import PostCard from "@/Components/NonPrimitive/PostCard";
 import axios from "axios";
+import MessagesCard from "@/Components/NonPrimitive/MesagesCard";
+import FollowerCard from "@/Components/NonPrimitive/FollowerCard";
+import { MessageSquare, UserPlus } from "lucide-react";
 
 export default function Feed(props) {
     // multilanguage code
@@ -20,9 +23,46 @@ export default function Feed(props) {
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     
+    // Track followed users globally
+    const [followedUsers, setFollowedUsers] = useState(
+        posts.reduce((acc, post) => {
+            acc[post.user_id] = post.user_followed;
+            return acc;
+        }, {})
+    );
+    
     // Reference to detect when user scrolls to bottom
     const observer = useRef();
     const lastPostElementRef = useRef();
+
+    // Function to handle follow/unfollow
+    const handleFollowUser = async (userId) => {
+        try {
+            const response = await fetch(
+                route("feed.user_follow", {
+                    user: userId,
+                    followed_by: props.auth.user.id
+                }), 
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": localStorage.getItem("csrf_token"),
+                        "Authorization": `Bearer ${localStorage.getItem("bearer_token")}`,
+                    },
+                }
+            );
+            const data = await response.json();
+            
+            // Update all posts with this user
+            setFollowedUsers(prev => ({
+                ...prev,
+                [userId]: data.followed
+            }));
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
 
     // Function to load more posts
     const loadMorePosts = async () => {
@@ -42,7 +82,20 @@ export default function Feed(props) {
             if (newPosts.length === 0) {
                 setHasMore(false);
             } else {
+                // Update posts and also update followed users state
                 setPosts(prevPosts => [...prevPosts, ...newPosts]);
+                
+                // Update followed users state with new posts
+                const newFollowedUsers = {};
+                newPosts.forEach(post => {
+                    newFollowedUsers[post.user_id] = post.user_followed;
+                });
+                
+                setFollowedUsers(prev => ({
+                    ...prev,
+                    ...newFollowedUsers
+                }));
+                
                 setPage(nextPage);
             }
         } catch (error) {
@@ -87,7 +140,18 @@ export default function Feed(props) {
                     Authorization: `Bearer ${localStorage.getItem('bearer_token')}`
                 }
             });
-            setPosts(response.data.posts); // Update state with new posts
+            
+            const latestPosts = response.data.posts;
+            setPosts(latestPosts); // Update state with new posts
+            
+            // Update followed users state with new posts
+            const newFollowedUsers = {};
+            latestPosts.forEach(post => {
+                newFollowedUsers[post.user_id] = post.user_followed;
+            });
+            
+            setFollowedUsers(newFollowedUsers);
+            
             setPage(1);
             setHasMore(true);
         } catch (error) {
@@ -97,11 +161,23 @@ export default function Feed(props) {
         }
     };
 
+
+    //adjusting the message appearance
+    const [messageActive,setMessageActive] = useState(false)
+    const messageSwitch = () =>{
+        setMessageActive(!messageActive)
+    }
+
+    //adjusting the follower appearance
+    const [followersActive,setFollowersActive] = useState(false)
+    const FollowSwitch = () =>{
+        setFollowersActive(!followersActive)
+    }
     return (
         <>
             <AuthenticatedLayout lang={lang}>
                 <Head title="Feed" />
-                <select value={lang} onChange={handleChange} className='m-4'>
+                <select value={lang} onChange={handleChange} className='m-4 mt-20'>
                     {languages.map((item) => {
                         return (
                             <option
@@ -117,7 +193,11 @@ export default function Feed(props) {
                     <div className="div1">
                         {/**post creation section */}
                         <div className="p-4">
-                            <h1 className="text-xl sm:text-2xl md:text-3xl border-b-2 border-[#000501] w-fit">{t("farmer_feed_title")}</h1>
+                            <h1 className="text-xl sm:text-2xl md:text-3xl border-b-2 border-[#000501] w-fit">{t("farmer_feed_title")} </h1>
+                            <div className="flex justify-evenly mt-4">
+                                <h1 className="text-lg sm:text-xl block md:hidden">Mesages <button onClick={messageSwitch}><MessageSquare className="md:hidden inline w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700"/></button></h1>
+                                <h1 className="text-lg sm:text-xl block md:hidden">Followers <button onClick={FollowSwitch}><UserPlus className="md:hidden inline w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700"/></button></h1>
+                            </div>
                             <PostCreation 
                                 username={props.auth.user.username} 
                                 onPostCreated={fetchLatestPosts}
@@ -129,9 +209,13 @@ export default function Feed(props) {
                                         return (
                                             <div ref={lastPostElementRef} key={post.post_id}>
                                                 <PostCard 
-                                                    post={post} 
+                                                    post={{
+                                                        ...post,
+                                                        user_followed: followedUsers[post.user_id]
+                                                    }} 
                                                     active_user_id={props.auth.user.id} 
-                                                    active_username={props.auth.user.username} 
+                                                    active_username={props.auth.user.username}
+                                                    onFollowToggle={handleFollowUser}
                                                 />
                                             </div>
                                         );
@@ -139,9 +223,13 @@ export default function Feed(props) {
                                         return (
                                             <PostCard 
                                                 key={post.post_id} 
-                                                post={post} 
+                                                post={{
+                                                    ...post,
+                                                    user_followed: followedUsers[post.user_id]
+                                                }} 
                                                 active_user_id={props.auth.user.id} 
-                                                active_username={props.auth.user.username} 
+                                                active_username={props.auth.user.username}
+                                                onFollowToggle={handleFollowUser}
                                             />
                                         );
                                     }
@@ -156,17 +244,10 @@ export default function Feed(props) {
                                 </div>
                             )}
                             
-                            {!hasMore && posts.length > 0 && (
-                                <div className="text-center py-4">
-                                    <p>{t("no_more_posts")}</p>
-                                </div>
-                            )}
                         </div>
                     </div>
-                    <div className="div2">
-                    </div>
-                    <div className="div3">
-                    </div>
+                    <MessagesCard user_id = {props.auth.user.id} active={messageActive} toggle={messageSwitch}/>
+                    <FollowerCard user_id = {props.auth.user.id} active={followersActive} toggle={FollowSwitch}/>
                 </div>
                 <Footer lang={lang} />
             </AuthenticatedLayout>
