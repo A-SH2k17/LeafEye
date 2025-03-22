@@ -20,7 +20,7 @@ export default function Navbar({lang,user}){
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between">
                         <div className="flex">
-                            <div className="flex shrink-0 items-center bg-zinc-50  p-2">
+                            <div className="flex shrink-0 items-center  p-2">
                                 <Link href={`/?lng=${lang}`}>
                                     <ApplicationLogo className="block h-full w-auto fill-current" />
                                 </Link>

@@ -62,7 +62,7 @@ export default function FollowerCard(props) {
     return (
         <div className={`div3 ${!props.active?"hidden":"block inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"} md:block fixed md:top-[25rem] md:right-0 px-6 md:w-1/2`}>
             <div className={`bg-[#e8fcef] w-full rounded-md shadow-xl flex flex-col p-4 mb-4 ${!limitFollowers?"h-[25em]":""} overflow-y-auto`}>
-                <button onClick={props.toggle}>
+                <button onClick={props.toggle} className={`${!props.active?"hidden":"block"}`}>
                         <X className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700" />
                 </button> 
                 <p className="font-bold text-center mb-4">Followers</p>
@@ -77,7 +77,7 @@ export default function FollowerCard(props) {
                             <img 
                                 src="/images/Welcome/cust.jpg" 
                                 alt="Profile Avatar" 
-                                className="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
+                                className="w-12 h-12 rounded-full object-cover"
                             />
                         </div>
                             <div className="flex-1">
@@ -95,7 +95,7 @@ export default function FollowerCard(props) {
                                                 <img 
                                                     src="/images/Welcome/cust.jpg" 
                                                     alt="Profile Avatar" 
-                                                    className="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
+                                                    className="w-12 h-12 rounded-full object-cover"
                                                 />
                                             </div>
                                             <div className="flex-1">

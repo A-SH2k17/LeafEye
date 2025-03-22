@@ -86,7 +86,7 @@ export default function PostCreation(props) {
                         <img 
                             src="/images/Welcome/cust.jpg" 
                             alt="Profile Avatar" 
-                            className="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
+                            className="w-12 h-12 rounded-full object-cover"
                         />
                     </div>
                     <span className="ml-3 text-lg text-gray-600 font-medium">{props.username}</span>

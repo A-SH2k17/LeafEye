@@ -86,7 +86,7 @@ export default function PostCard(props){
                     <img 
                         src="/images/Welcome/cust.jpg" 
                         alt="Profile Avatar" 
-                        className="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
+                        className="w-12 h-12 rounded-full object-cover"
                     />
                 </div>
                 <span className="mx-3 text-lg text-gray-600 font-medium">{props.post.post_user}</span>

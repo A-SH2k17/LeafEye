@@ -32,7 +32,7 @@ export default function MessagesCard(props){
     return(
         <div className={`div2 ${!props.active?"hidden":"block inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"} md:block fixed md:top-20 md:right-0 px-6 md:w-1/2`}>
             <div className="bg-[#e8fcef] w-full rounded-sm shadow-xl flex flex-col mb-4 h-[19em] overflow-y-auto px-10 pt-4">
-                <button onClick={props.toggle}>
+                <button onClick={props.toggle} className={`${!props.active?"hidden":"block"}`}>
                     <X className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700" />
                 </button> 
                 <p className="font-bold text-center mb-4"> Recieved Messages </p>
