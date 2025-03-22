@@ -11,8 +11,41 @@ import axios from "axios";
 import MessagesCard from "@/Components/NonPrimitive/MesagesCard";
 import FollowerCard from "@/Components/NonPrimitive/FollowerCard";
 import { MessageSquare, UserPlus } from "lucide-react";
+import PageTitle from "@/Components/Primitive/PageTitle";
 
 export default function Feed(props) {
+
+    //code to save csrf and beareer token to avoid the 419 and 401 error in post
+    useEffect(() => {
+        // Extract CSRF token from URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("csrfToken");
+        const bearer = params.get("bearer_token");
+
+        if (token) {
+            localStorage.setItem("csrf_token", token); // Save to localStorage
+            //setCsrfToken(token); // Update state
+            console.log("CSRF Token saved:", token);
+
+            // Remove csrfToken from URL
+            params.delete("csrfToken");
+            const newUrl = window.location.pathname + (params.toString() ? "?" + params.toString() : "");
+            window.history.replaceState({}, "", newUrl);
+        }
+
+        if(bearer){
+            localStorage.setItem("bearer_token", bearer); // Save to localStorage
+            //setCsrfToken(token); // Update state
+            console.log("Bearer Token saved:", bearer);
+
+            // Remove csrfToken from URL
+            params.delete("bearer_token");
+            const newUrl = window.location.pathname + (params.toString() ? "?" + params.toString() : "");
+            window.history.replaceState({}, "", newUrl);
+        }
+    }, []);
+
+
     // multilanguage code
     const { lang, handleChange, languages } = useLanguage();
     const { t } = useTranslation();
@@ -173,6 +206,8 @@ export default function Feed(props) {
     const FollowSwitch = () =>{
         setFollowersActive(!followersActive)
     }
+
+    //start of page html
     return (
         <>
             <AuthenticatedLayout lang={lang}>
@@ -193,7 +228,7 @@ export default function Feed(props) {
                     <div className="div1">
                         {/**post creation section */}
                         <div className="p-4">
-                            <h1 className="text-xl sm:text-2xl md:text-3xl border-b-2 border-[#000501] w-fit">{t("farmer_feed_title")} </h1>
+                            <PageTitle title={t("farmer_feed_title")}/>
                             <div className="flex justify-evenly mt-4">
                                 <h1 className="text-lg sm:text-xl block md:hidden">Mesages <button onClick={messageSwitch}><MessageSquare className="md:hidden inline w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700"/></button></h1>
                                 <h1 className="text-lg sm:text-xl block md:hidden">Followers <button onClick={FollowSwitch}><UserPlus className="md:hidden inline w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700"/></button></h1>

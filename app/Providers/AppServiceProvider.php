@@ -34,5 +34,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->routes(); 
         Vite::prefetch(concurrency: 3);
+        \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('plants');
     }
 }

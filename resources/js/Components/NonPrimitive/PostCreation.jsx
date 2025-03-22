@@ -26,7 +26,7 @@ export default function PostCreation(props) {
         formData.append('text', postText);
         formData.append('username', props.username);
         
-        console.log(selectedImage);
+        //console.log(selectedImage);
         if (selectedImage) {
             formData.append("image", selectedImage); // Directly send file, no base64
         }
