@@ -173,7 +173,7 @@ export default function AddPlant(props) {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <Footer lang={lang}/>
         </AuthenticatedLayout>
     );
 }

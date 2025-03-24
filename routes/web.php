@@ -1,11 +1,17 @@
 <?php
 
+use App\Http\Controllers\AiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\NormalUser\FollowerController;
 use App\Http\Controllers\NormalUser\MessagesController;
 use App\Http\Controllers\NormalUser\PlantMonitorController;
+use App\Models\Plant;
+use App\Models\Plant_Image;
+use App\Models\Plant_Monitor;
+use Carbon\Carbon;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -22,8 +28,17 @@ Route::get('/', function () {
 Route::get('/ai_features',function(){
     return Inertia::render('AiFeatures');
 })->name('features_ai');
+
 Route::get('/home', function () {
-    return Inertia::render('AuthenticatedUsers/Dashboard');
+    $monitors = Plant_Monitor::where("planted_by",Auth::user()->id)->orderBy('created_at', 'desc')->get();
+    $user_plants = [];
+    foreach($monitors as $monitor){
+        $planttype = Plant::where("id",$monitor->plant_id)->first()->plant_type;
+        $planted_at = Carbon::parse($monitor->date_planted)->format('F j, Y');
+        $image = Plant_Image::where('monitor_id',$monitor->id)->orderBy('created_at', 'desc')->first()->image_path;
+        array_push($user_plants,["type"=>$planttype,"datePlanted"=>$planted_at,"image_path"=>$image,"id"=>$monitor->id]);
+    }
+    return Inertia::render('AuthenticatedUsers/Dashboard',["user_plants"=>$user_plants]);
 })->middleware(['auth', 'verified'])->name('users_home');
 
 
@@ -62,6 +77,12 @@ Route::middleware('auth')->controller(PlantMonitorController::class)->group(func
     Route::get('/plantMonitor/{user}/addImage','imageAdd')->name('montor.add_plant_image');
     Route::post('/image/add','addPlantImage')->name('montor.add_plant_image_action');
     Route::post('/plant/add','addPlantDB')->name('monitor.add_plant_submit');
+});
+
+
+//routes of the Disease
+Route::middleware('auth')->controller(AiController::class)->group(function(){
+    Route::get('/{user}/detectDisease','disease_index')->name('ai.disease_index');
 });
 
 require __DIR__.'/auth.php';

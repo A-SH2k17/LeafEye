@@ -46,10 +46,14 @@ class PlantMonitorController extends Controller
             }
             $user_id = $user->id;
 
-            $monitor = Plant_Monitor::where('planted_by', $user_id)
-                                    ->whereDate('date_planted', now())
-                                    ->first();
 
+            $latestMonitor = Plant_Monitor::where('planted_by', $user_id)
+                ->latest('date_planted') // Get the most recent one
+                ->first();
+          
+            $monitor = ($latestMonitor && $latestMonitor->date_planted < now()) ? null : $latestMonitor;
+
+            
             if (!$monitor) {
                 $monitor = Plant_Monitor::create([
                     "date_planted" => now(),
@@ -66,7 +70,7 @@ class PlantMonitorController extends Controller
 
             DB::commit();
 
-            return back()->with("success","Plant Added Succesfully");
+            return redirect('/home')->with("success","Plant Added Succesfully");
         } catch (\Exception $e) {
             DB::rollBack(); 
             return back()->with("error",$e->getMessage());

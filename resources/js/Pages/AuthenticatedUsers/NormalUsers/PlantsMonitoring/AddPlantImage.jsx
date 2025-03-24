@@ -177,7 +177,7 @@ export default function AddPlantImage(props) {
                     </div>
                 </div>
             </div>
-            <Footer />
+            <Footer lang={lang}/>
         </AuthenticatedLayout>
     );
 }

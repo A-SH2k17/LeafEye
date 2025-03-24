@@ -8,9 +8,9 @@ export default function PlantCard({plant}){
         <div className="sm:w-[25vh] md:w-[50vh]  bg-[#A6C5A7] m-5 rounded-2xl p-4 shadow-lg">
             <div className="bg-gray-200 rounded-lg overflow-hidden mb-4 flex">
                 <img 
-                src="images/Welcome/7.png" 
+                src={`/storage/${plant.image_path}`} 
                 alt={plant.type} 
-                className="h-[150px] object-cover"
+                className="h-[150px] w-1/2 object-cover"
                 />
                 <div className="p-4">
                     <p className="font-medium">{t("plant_type")}</p>

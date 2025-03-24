@@ -7,7 +7,7 @@ import PrimaryButton from '@/Components/Primitive/PrimaryButton';
 import PlantCard from '@/Components/NonPrimitive/PlantCard';
 import Footer from '@/Components/NonPrimitive/Footer';
 
-export default function Dashboard() {
+export default function Dashboard(props) {
 
 
     //code to save csrf and beareer token to avoid the 419 and 401 error in post
@@ -73,16 +73,17 @@ export default function Dashboard() {
 
 
      // Sample plant data
-     const plants = [
-         { id: 1, type: "Boston Fern", datePlanted: "Jan 15, 2025" },
-         { id: 2, type: "Snake Plant", datePlanted: "Dec 3, 2024" },
-         { id: 3, type: "Monstera", datePlanted: "Feb 2, 2025" },
-         { id: 4, type: "Spider Plant", datePlanted: "Jan 28, 2025" },
-         { id: 5, type: "Peace Lily", datePlanted: "Nov 12, 2024" }
-     ];
- 
-     const visiblePlants = 3;
-     const maxIndex = Math.max(0, plants.length - visiblePlants);
+    //  const plants = [
+    //      { id: 1, type: "Boston Fern", datePlanted: "Jan 15, 2025" },
+    //      { id: 2, type: "Snake Plant", datePlanted: "Dec 3, 2024" },
+    //      { id: 3, type: "Monstera", datePlanted: "Feb 2, 2025" },
+    //      { id: 4, type: "Spider Plant", datePlanted: "Jan 28, 2025" },
+    //      { id: 5, type: "Peace Lily", datePlanted: "Nov 12, 2024" }
+    //  ];
+
+    const plants = props.user_plants;
+    const visiblePlants = 3;
+    const maxIndex = Math.max(0, plants.length - visiblePlants);
  
      const nextSlide = () => {
          setCurrentIndex(prevIndex => 
@@ -115,62 +116,73 @@ export default function Dashboard() {
 
             <div className="flex p-2">
                 <h1 className="text-2xl sm:text-2xl md:text-3xl mr-4">{t("colllection_title")}</h1>
-                <PrimaryButton><Link>{t("add_plant_button")}</Link></PrimaryButton>
+                <PrimaryButton><Link
+                    href={`/plantMonitor/${props.auth.user.username}/addPlant`}
+                >{t("add_plant_button")}</Link></PrimaryButton>
             </div>
-
-                {/**This section is for the carrousel */}
-            <div className="relative">
-                {/* Navigation buttons */}
-                <button 
-                onClick={prevSlide}
-                disabled={currentIndex === 0}
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 disabled:opacity-50"
-                >
-                ← 
-                </button>
-                
-                {/* Carousel container */}
-                <div className="overflow-hidden">
-                    <div 
-                        className="flex transition-transform duration-700 ease-in-out"
-                        style={{ transform: `translateX(-${currentIndex * (100 / visibleCards)}%)` }}
-                    >
-                        {plants.map(plant => (
+            { plants.length==0&&
+                <div className="flex justify-center">
+                    <h1 className='p-5'> You currently monitor no plants in your collection....</h1>
+                </div>
+            }
+            {
+                plants.length>0 &&
+                <>
+                    {/**This section is for the carrousel */}
+                    <div className="relative">
+                        {/* Navigation buttons */}
+                        <button 
+                        onClick={prevSlide}
+                        disabled={currentIndex === 0}
+                        className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 disabled:opacity-50"
+                        >
+                        ← 
+                        </button>
+                        
+                        {/* Carousel container */}
+                        <div className="overflow-hidden">
                             <div 
-                                key={plant.id} 
-                                className={`flex-none px-2 ${
-                                    visibleCards === 1 ? 'w-full' : 
-                                    visibleCards === 2 ? 'w-1/2' : 'w-1/3'
-                                }`}
+                                className="flex transition-transform duration-700 ease-in-out"
+                                style={{ transform: `translateX(-${currentIndex * (100 / visibleCards)}%)` }}
                             >
-                                <PlantCard plant={plant}/>
+                                {plants.map(plant => (
+                                    <div 
+                                        key={plant.id} 
+                                        className={`flex-none px-2 ${
+                                            visibleCards === 1 ? 'w-full' : 
+                                            visibleCards === 2 ? 'w-1/2' : 'w-1/3'
+                                        }`}
+                                    >
+                                        <PlantCard plant={plant}/>
+                                    </div>
+                                ))}
                             </div>
+                        </div>
+                        
+                        <button 
+                        onClick={nextSlide}
+                        disabled={currentIndex >= maxIndex}
+                        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 disabled:opacity-50"
+                        >
+                        →
+                        </button>
+                    </div>
+            
+                {/* Pagination indicators */}
+                    <div className="flex justify-center gap-2 my-4">
+                        {Array.from({ length: maxIndex + 1 }).map((_, index) => (
+                            <button
+                                key={index}
+                                className={`h-2 rounded-full transition-all ${
+                                    currentIndex === index ? 'w-6 bg-green-600' : 'w-2 bg-gray-300'
+                                }`}
+                                onClick={() => setCurrentIndex(index)}
+                                aria-label={`Go to slide ${index + 1}`}
+                            />
                         ))}
                     </div>
-                </div>
-                
-                <button 
-                onClick={nextSlide}
-                disabled={currentIndex >= maxIndex}
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-10 disabled:opacity-50"
-                >
-                →
-                </button>
-            </div>
-      
-        {/* Pagination indicators */}
-            <div className="flex justify-center gap-2 my-4">
-                {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-                    <button
-                        key={index}
-                        className={`h-2 rounded-full transition-all ${
-                            currentIndex === index ? 'w-6 bg-green-600' : 'w-2 bg-gray-300'
-                        }`}
-                        onClick={() => setCurrentIndex(index)}
-                        aria-label={`Go to slide ${index + 1}`}
-                    />
-                ))}
-            </div>
+                </>
+            }
 
             {/**This is the Detect Disease Section */}
             
@@ -216,7 +228,7 @@ export default function Dashboard() {
                     </div>
                 </div>
             </div>
-        <Footer></Footer>
+        <Footer lang={lang}/>
         </AuthenticatedLayout>
     );
 }
