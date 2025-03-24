@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Disease_Detection;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -13,6 +15,33 @@ class AiController extends Controller
 {
     function disease_index(){
         return Inertia::render('AuthenticatedUsers/NormalUsers/AI/CropDiseaseDetection');
+    }
+
+    public function test(Request $request){
+
+
+        $request->validate([
+            'image' => 'required|image|max:2048',
+        ]);
+
+        // Store the uploaded image
+        $imagePath = $request->file('image')->store('crop_images', 'public');
+        $imageFullPath = Storage::disk('public')->path($imagePath);
+
+        try{
+            $response = Http::attach(
+                'image',
+                file_get_contents($imageFullPath),
+                basename($imageFullPath)
+            )->post(config('services.flask_api.url') . '/detect');
+            return $response;
+            
+        }catch(Exception $e){
+            return response()->json([
+                "success"=>false,
+                "error"=>$e->getMessage(),
+            ]);
+        }
     }
 
     public function detectDisease(Request $request)

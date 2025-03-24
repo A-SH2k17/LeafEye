@@ -63,9 +63,12 @@ export default function CropDiseaseDetection(){
                     'Content-Type': 'multipart/form-data'
                 }
             });
-            
             if (response.data.success) {
-                setDetectionResult(response.data.data);
+                let detect = {
+                    "disease":response.data.disease,
+                    "confidence": response.data.confidence
+                }
+                setDetectionResult(detect);
             } else {
                 setError(response.data.message || "Failed to detect disease");
             }
@@ -93,6 +96,7 @@ export default function CropDiseaseDetection(){
                         );
                     })}
                 </select>
+                <button onClick={()=>(alert(detectionResult))}>Test</button>
                 <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className=" overflow-hidden shadow-2xl sm:rounded-lg">

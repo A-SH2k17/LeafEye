@@ -83,6 +83,7 @@ Route::middleware('auth')->controller(PlantMonitorController::class)->group(func
 //routes of the Disease
 Route::middleware('auth')->controller(AiController::class)->group(function(){
     Route::get('/{user}/detectDisease','disease_index')->name('ai.disease_index');
+    Route::post('/crop-disease/detect','test')->name('ai.disease_detect');
 });
 
 require __DIR__.'/auth.php';

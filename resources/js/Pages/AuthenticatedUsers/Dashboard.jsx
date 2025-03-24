@@ -198,7 +198,9 @@ export default function Dashboard(props) {
                 </div>
                 
                 <div className="md:w-1/2 flex justify-center items-start">
-                    <Link>
+                    <Link
+                        href={`${props.auth.user.username}/detectDisease`}
+                    >
                         <PrimaryButton
                             className='h-16'
                         >
