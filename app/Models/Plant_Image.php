@@ -20,4 +20,8 @@ class Plant_Image extends Model
     public function plant(){
         return $this->belongsTo(Plant::class);
     }
+
+    public function monitor(){
+        return $this->belongsTo(Plant_Monitor::class, 'monitor_id');
+    }
 }

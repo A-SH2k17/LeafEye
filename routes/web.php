@@ -30,14 +30,21 @@ Route::get('/ai_features',function(){
 })->name('features_ai');
 
 Route::get('/home', function () {
-    $monitors = Plant_Monitor::where("planted_by",Auth::user()->id)->orderBy('created_at', 'desc')->get();
-    $user_plants = [];
-    foreach($monitors as $monitor){
-        $planttype = Plant::where("id",$monitor->plant_id)->first()->plant_type;
-        $planted_at = Carbon::parse($monitor->date_planted)->format('F j, Y');
-        $image = Plant_Image::where('monitor_id',$monitor->id)->orderBy('created_at', 'desc')->first()->image_path;
-        array_push($user_plants,["type"=>$planttype,"datePlanted"=>$planted_at,"image_path"=>$image,"id"=>$monitor->id]);
-    }
+    $user_plants = Plant_Monitor::with(['plant', 'images' => function($query) {
+        $query->latest()->limit(1);
+    }])
+    ->where("planted_by", Auth::user()->id)
+    ->orderBy('created_at', 'desc')
+    ->get()
+    ->map(function($monitor) {
+        return [
+            "type" => $monitor->plant->plant_type,
+            "datePlanted" => Carbon::parse($monitor->date_planted)->format('F j, Y'),
+            "image_path" => $monitor->images->first()->image_path ?? null,
+            "id" => $monitor->id
+        ];
+    })
+    ->toArray();
     return Inertia::render('AuthenticatedUsers/Dashboard',["user_plants"=>$user_plants]);
 })->middleware(['auth', 'verified'])->name('users_home');
 

@@ -21,7 +21,11 @@ class Plant_Monitor extends Model
         return $this->belongsTo(User::class,'planted_by');
     }
 
-    public function plants(){
+    public function plant(){
         return $this->belongsTo(Plant::class);
+    }
+
+    public function images(){
+        return $this->hasMany(Plant_Image::class, 'monitor_id');
     }
 }

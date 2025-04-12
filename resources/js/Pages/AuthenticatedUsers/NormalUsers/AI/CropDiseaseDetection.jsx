@@ -66,8 +66,10 @@ export default function CropDiseaseDetection(){
             if (response.data.success) {
                 let detect = {
                     "disease":response.data.disease,
-                    "confidence": response.data.confidence
+                    "confidence": response.data.confidence,
+                    "recommendations": response.data.recommendations
                 }
+                console.log(detect);
                 setDetectionResult(detect);
             } else {
                 setError(response.data.message || "Failed to detect disease");

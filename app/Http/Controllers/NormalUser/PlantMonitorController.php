@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\Monitor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class PlantMonitorController extends Controller
@@ -33,6 +34,16 @@ class PlantMonitorController extends Controller
         DB::beginTransaction(); // Ensure data integrity
 
         try {
+            $validator = Validator::make($request->all(), [
+                'plantType' => 'required|string|max:255',
+                'image' => 'required|image|max:2048',
+                'username' => 'required|exists:users,username'
+            ]);
+
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput();
+            }
+
             $imagePath = null;
             if ($request->hasFile('image')) {
                 $imagePath = $request->file('image')->store("user_plants/{$request->username}", 'public');
@@ -42,7 +53,7 @@ class PlantMonitorController extends Controller
 
             $user = User::where("username", $request->username)->first();
             if (!$user) {
-                return back()->with("error","No user foudn");
+                return back()->with("error","No user found");
             }
             $user_id = $user->id;
 
