@@ -22,11 +22,13 @@ class Shop extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function inventory(){
-        return $this->hasOne(Inventory::class);
-    }
+   
 
     public function shopAdminDecision(){
         return $this->hasOne(Admin_Shop_Decisions::class);
+    }
+
+    public function product(){
+        return $this->hasMany(Product::class);
     }
 }

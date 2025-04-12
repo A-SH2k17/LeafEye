@@ -336,10 +336,10 @@ export default function Register() {
                         required
                     >
                         <option value="">Select store type</option>
-                        <option value="fertilizer">Fertilizer Store</option>
-                        <option value="seed">Seed Store</option>
-                        <option value="tools">Farming Tools Store</option>
-                        <option value="accessory">Farming Accessory Store</option>
+                        <option value="Fertilizer Store">Fertilizer Store</option>
+                        <option value="Seed Store">Seed Store</option>
+                        <option value="Farming Tools Store">Farming Tools Store</option>
+                        <option value="Farming Accessory Store">Farming Accessory Store</option>
                     </select>
                     {errors.storeType && (
                         <div className="text-red-500 text-sm mt-1">{errors.storeType}</div>

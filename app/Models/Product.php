@@ -14,13 +14,16 @@ class Product extends Model
         'name',
         'image_path',
         'price',
+        'quantity',
+        'shop_id'
     ];
 
     public function orderProductDetails(){
         return $this->hasMany(Order_Product_Detail::class);
     }
 
-    public function inventory(){
-        return $this->hasOne(Inventory::class);
+    public function Shop(){
+        return $this->belongsTo(Shop::class);
     }
+    
 }

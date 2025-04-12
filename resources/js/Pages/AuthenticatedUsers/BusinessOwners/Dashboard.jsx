@@ -1,11 +1,15 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { useEffect } from 'react';
+import { useEffect ,useState} from 'react';
 import { useLanguage } from '@/multilanguage';
 import { useTranslation } from 'react-i18next';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { ChevronUp, ChevronDown, RefreshCw, DollarSign, Package, TrendingUp, Plus, Minus } from 'lucide-react';
+import PrimaryButton from '@/Components/Primitive/PrimaryButton';
+import SecondaryButton from '@/Components/Primitive/SecondaryButton';
 
-export default function BusinessDashboard({ auth,lng}) {
+export default function BusinessDashboard({ auth,lng,shop}) {
 
     //code to save csrf and beareer token to avoid the 419 and 401 error in post
         useEffect(() => {
@@ -44,11 +48,98 @@ export default function BusinessDashboard({ auth,lng}) {
 
 
 
+         // Sample data
+         const [inventoryData, setInventoryData] = useState([
+            { id: 1, name: "Tomato Seeds", stock: 150, price: 2 },
+            { id: 2, name: "Carrot Seeds", stock: 200, price: 1.5 },
+            { id: 3, name: "Lettuce Seeds", stock: 180, price: 1.2 },
+            { id: 4, name: "Spinach Seeds", stock: 160, price: 1.3 },
+            { id: 5, name: "Cucumber Seeds", stock: 140, price: 1.8 },
+            { id: 6, name: "Pumpkin Seeds", stock: 100, price: 2.5 },
+            { id: 7, name: "Watermelon Seeds", stock: 90, price: 3 },
+            { id: 8, name: "Chili Pepper Seeds", stock: 170, price: 2.2 },
+            { id: 9, name: "Onion Seeds", stock: 130, price: 1.6 },
+            { id: 10, name: "Broccoli Seeds", stock: 120, price: 2 },
+            { id: 11, name: "Corn Seeds", stock: 110, price: 2.4 },
+            { id: 12, name: "Pea Seeds", stock: 115, price: 1.9 },
+            { id: 13, name: "Cauliflower Seeds", stock: 105, price: 2.1 },
+            { id: 14, name: "Beetroot Seeds", stock: 125, price: 1.7 },
+            { id: 15, name: "Radish Seeds", stock: 135, price: 1.4 },
+            { id: 16, name: "Zucchini Seeds", stock: 145, price: 2.3 },
+        ]);
+        
+
+        const salesData = [
+            { month: 'Jan', sales: 5400 },
+            { month: 'Feb', sales: 6200 },
+            { month: 'Mar', sales: 8100 },
+            { month: 'Apr', sales: 7300 },
+            { month: 'May', sales: 9000 },
+            { month: 'Jun', sales: 10500 },
+        ];
+
+        // Calculated metrics
+        const totalSales = salesData.reduce((sum, item) => sum + item.sales, 0);
+        const totalInventoryValue = inventoryData.reduce((sum, item) => sum + (item.stock * item.price), 0);
+        const totalItems = inventoryData.reduce((sum, item) => sum + item.stock, 0);
+        
+        // State for filtering and sorting
+        const [sortField, setSortField] = useState('name');
+        const [sortDirection, setSortDirection] = useState('asc');
+        const [activeCategory, setActiveCategory] = useState('All');
+        const [selectedTimeRange, setSelectedTimeRange] = useState('6M');
+
+        // Sort inventory data
+        const sortedInventory = [...inventoryData].sort((a, b) => {
+            if (sortDirection === 'asc') {
+            return a[sortField] > b[sortField] ? 1 : -1;
+            } else {
+            return a[sortField] < b[sortField] ? 1 : -1;
+            }
+        });
+
+        // Filter inventory data by category
+        const filteredInventory = activeCategory === 'All' 
+            ? sortedInventory 
+            : sortedInventory.filter(item => item.category === activeCategory);
+
+        // Handle sorting
+        const handleSort = (field) => {
+            if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+            } else {
+            setSortField(field);
+            setSortDirection('asc');
+            }
+        };
+
+        // Get filtered sales data based on time range
+        const getFilteredSalesData = () => {
+            switch (selectedTimeRange) {
+            case '3M':
+                return salesData.slice(3);
+            case '6M':
+                return salesData;
+            default:
+                return salesData;
+            }
+        };
+
+        const updateStock = (id, increment) => {
+            setInventoryData(prevData =>
+              prevData.map(item => {
+                if (item.id === id) {
+                  return { ...item, stock: increment ? item.stock + 1 : Math.max(0, item.stock - 1) };
+                }
+                return item;
+              })
+            );
+          };
+
     return (
         <AuthenticatedLayout
             lang = {lang}
         >
-            {/**Test github  */}
             <Head title="Business Dashboard" />
             <select value={lang} onChange={handleChange} className='m-4 mt-20'>
                     {languages.map((item) => {
@@ -62,17 +153,180 @@ export default function BusinessDashboard({ auth,lng}) {
                         );
                     })}
             </select>
-
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <h1 className="text-2xl font-bold mb-4">Welcome, Business Owner!</h1>
-                            <p>This is your business dashboard. Here you can manage your shop and products.</p>
-                        </div>
+            <div className='p-4'>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">{shop[0].name} - Inventory Management</h1>
+                <h2 className='text-xl sm:2xl md:3xl font-semibold'>{shop[0].type}</h2>
+            </div>
+        
+            <div className="max-w-7xl mx-auto text-center">
+                <div className="bg-white shadow-md overflow-hidden  sm:rounded-lg">
+                    <div className="p-6 text-gray-900">
+                        <h1 className="text-2xl font-bold mb-4">Welcome {auth.user.first_name}</h1>
+                        <p>This is your business dashboard. Here you can manage your shop and products.</p>
                     </div>
                 </div>
             </div>
+
+            {/**Kpi Sections */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 m-10">
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3">
+                    <div className="bg-green-100 p-3 rounded-full">
+                    <DollarSign size={24} className="text-green-600" />
+                    </div>
+                    <div>
+                    <h3 className="text-gray-500 text-sm">Total Sales</h3>
+                    <p className="text-2xl font-bold">${totalSales.toLocaleString()}</p>
+                    <p className="text-green-600 text-sm flex items-center">
+                        <TrendingUp size={14} className="mr-1" />
+                        +12.5% from last period
+                    </p>
+                    </div>
+                </div>
+                </div>
+                
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3">
+                    <div className="bg-blue-100 p-3 rounded-full">
+                    <Package size={24} className="text-blue-600" />
+                    </div>
+                    <div>
+                    <h3 className="text-gray-500 text-sm">Inventory Value</h3>
+                    <p className="text-2xl font-bold">${totalInventoryValue.toLocaleString()}</p>
+                    <p className="text-sm text-gray-500">Across {inventoryData.length} products</p>
+                    </div>
+                </div>
+                </div>
+                
+                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3">
+                    <div className="bg-purple-100 p-3 rounded-full">
+                    <Package size={24} className="text-purple-600" />
+                    </div>
+                    <div>
+                    <h3 className="text-gray-500 text-sm">Items in Stock</h3>
+                    <p className="text-2xl font-bold">{totalItems.toLocaleString()}</p>
+                    <p className="text-sm text-gray-500">{Math.round(totalItems / inventoryData.length)} avg per product</p>
+                    </div>
+                </div>
+                </div>
+            </div>
+        
+        {/* Sales Chart */}
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 m-6">
+            <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">Sales Trend</h2>
+            <div className="flex bg-gray-100 rounded-md">
+                <button 
+                className={`px-3 py-1 text-sm rounded-md ${selectedTimeRange === '3M' ? 'bg-leaf-button-200 text-white' : 'text-gray-600'}`}
+                onClick={() => setSelectedTimeRange('3M')}
+                >
+                3M
+                </button>
+                <button 
+                className={`px-3 py-1 text-sm rounded-md ${selectedTimeRange === '6M' ? 'bg-leaf-button-200 text-white' : 'text-gray-600'}`}
+                onClick={() => setSelectedTimeRange('6M')}
+                >
+                6M
+                </button>
+            </div>
+            </div>
+            <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={getFilteredSalesData()} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                <XAxis dataKey="month" stroke="#6b7280" />
+                <YAxis stroke="#6b7280" />
+                <Tooltip 
+                    contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                    formatter={(value) => [`$${value.toLocaleString()}`, 'Sales']}
+                />
+                <Line 
+                    type="monotone" 
+                    dataKey="sales" 
+                    stroke="#00796A" 
+                    strokeWidth={2} 
+                    dot={{ fill: '#00796A', r: 4 }}
+                    activeDot={{ r: 6 }}
+                />
+                </LineChart>
+            </ResponsiveContainer>
+            </div>
+        </div>
+
+
+         {/* Inventory Table */}
+<div className="bg-white rounded-lg shadow-sm border border-gray-100">
+  <div className="p-4 border-b border-gray-100">
+    <div className="flex justify-between items-center">
+      <h2 className="text-lg font-semibold text-gray-800">Inventory List &nbsp; <PrimaryButton>Add Item To Inventory</PrimaryButton></h2>
+    </div>
+  </div>
+  <div className="overflow-x-auto">
+    <table className="w-full">
+      <thead className="bg-gray-50 text-gray-700 text-sm">
+        <tr>
+          <th className="p-4 text-left cursor-pointer" onClick={() => handleSort('name')}>
+            <div className="flex items-center">
+              Product Name
+              {sortField === 'name' && (
+                sortDirection === 'asc' ? <ChevronUp size={16} className="ml-1" /> : <ChevronDown size={16} className="ml-1" />
+              )}
+            </div>
+          </th>
+          <th className="p-4 text-center">Quantity</th>
+          <th className="p-4 text-center">Unit Price</th>
+          <th className="p-4 text-center">Total Value</th>
+          <th className="p-4 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody className="text-gray-700">
+        {filteredInventory.map((item) => (
+          <tr key={item.id} className="border-t border-gray-100 hover:bg-gray-50">
+            <td className="p-4 font-medium">{item.name}</td>
+            <td className="p-4">
+              <div className="flex items-center justify-center space-x-2">
+                <span className="text-lg font-medium">{item.stock}</span>
+                <div className="flex">
+                  <button 
+                    onClick={() => updateStock(item.id, true)}
+                    className="bg-green-500 text-white rounded-l p-1 hover:bg-green-600"
+                  >
+                    <Plus size={16} />
+                  </button>
+                  <button 
+                    onClick={() => updateStock(item.id, false)}
+                    className="bg-red-500 text-white rounded-r p-1 hover:bg-red-600"
+                  >
+                    <Minus size={16} />
+                  </button>
+                </div>
+              </div>
+            </td>
+            <td className="p-4 text-center">${item.price}</td>
+            <td className="p-4 text-center">${(item.stock * item.price).toLocaleString()}</td>
+            <td className="p-4">
+              <div className="flex justify-center space-x-2">
+                <PrimaryButton>
+                    Update Stock
+                </PrimaryButton>
+                <SecondaryButton className='bg-red-500 text-white hover:bg-red-300 hover:text-black'>
+                    Delete
+                </SecondaryButton>
+                <SecondaryButton className='bg-gray-100 hover:bg-gray-50'>
+                    Edit Item
+                </SecondaryButton>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <div className="p-4 border-t border-gray-100 text-sm text-gray-500">
+    Showing {filteredInventory.length} of {inventoryData.length} products
+  </div>
+</div>
         </AuthenticatedLayout>
     );
 } 
