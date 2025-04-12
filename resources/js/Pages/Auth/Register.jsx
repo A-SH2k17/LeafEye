@@ -46,7 +46,7 @@ export default function Register() {
     
     if (step === 3 && !showBusinessStep) {
         // Skip business info step for non-business users
-        submiy();
+        submit();
         return;
     }
     
@@ -370,7 +370,7 @@ export default function Register() {
                 ) : (
                     <button
                     type="submit"
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    className="px-4 py-2 bg-green-500 text-white rounded hover:leaf-button-200"
                     disabled={processing}
                     >
                     Register

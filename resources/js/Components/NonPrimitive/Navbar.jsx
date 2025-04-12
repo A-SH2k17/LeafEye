@@ -36,7 +36,7 @@ export default function Navbar({lang,user}){
                                         {t("home_link")}
                                     </NavLink>
                                     {
-                                        user && (<NavLink
+                                        user  && (<NavLink
                                             className="navText"
                                             href={route('feed.index',user.username)}
                                             active={route().current('feed.index')}

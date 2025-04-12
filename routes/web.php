@@ -93,4 +93,11 @@ Route::middleware('auth')->controller(AiController::class)->group(function(){
     Route::post('/crop-disease/detect','test')->name('ai.disease_detect');
 });
 
+// Business Owner Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/business/dashboard', function () {
+        return Inertia::render('AuthenticatedUsers/BusinessOwners/Dashboard');
+    })->name('business.dashboard');
+});
+
 require __DIR__.'/auth.php';

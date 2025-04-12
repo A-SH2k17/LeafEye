@@ -33,8 +33,23 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
-        $user = User::where('email',$request->email)->first();
-        return redirect()->intended(route('users_home',['csrfToken' => csrf_token(),"bearer_token"=>$user->createToken(time())->plainTextToken], absolute: false));
+        $user = User::where('email', $request->email)->first();
+        
+        // Create token for API authentication
+        $token = $user->createToken(time())->plainTextToken;
+        
+        // Redirect based on user type
+        if ($user->role == "business") {
+            return redirect()->intended(route('business.dashboard', [
+                'csrfToken' => csrf_token(),
+                'bearer_token' => $token
+            ], absolute: false));
+        }
+        
+        return redirect()->intended(route('users_home', [
+            'csrfToken' => csrf_token(),
+            'bearer_token' => $token
+        ], absolute: false));
     }
 
     /**
