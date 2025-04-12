@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Shop;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Illuminate\Support\Facades\Log;
@@ -40,10 +41,16 @@ class HandleInertiaRequests extends Middleware
             'error' => $request->session()->get('error'),
         ]);
         
-        
+        $userShop = null;
 
+        if ($request->user() != null && $request->user()->role=="business"){
+            $userShop = Shop::where('user_id',$request->user()->id)->first();
+        }
         return [
             ...parent::share($request),
+            'shop'=> [
+                $userShop
+            ],
             'auth' => [
                 'user' => $request->user(),
             ],

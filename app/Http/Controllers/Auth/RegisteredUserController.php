@@ -60,10 +60,10 @@ class RegisteredUserController extends Controller
         // Redirect based on user type
         if ($request->customerType === 'business') {
             $shop = Shop::create([
-                'name' => $request->first_name . ' ' . $request->last_name,
-                'location' => $request->location,
-                'phone_number' => $request->phone_number,
-                'email' => $request->email,
+                'name' => $request->storeName,
+                'address' => $request->storeAddress,
+                'commercial_registration' => $request->commercialRegistrationNumber,
+                'type' => $request->storeType,
                 'user_id' => $user->id,
             ]);
             return redirect(route('business.dashboard', [

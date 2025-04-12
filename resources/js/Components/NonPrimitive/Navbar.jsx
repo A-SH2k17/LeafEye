@@ -28,29 +28,33 @@ export default function Navbar({lang,user}){
                         </div>
                         <div>
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex sm:mt-3 ">
-                                    <NavLink
-                                        className="navText"
-                                        href={route('users_home',{lng:lang})}
-                                        active={route().current('users_home') || route().current('welcome')}
-                                    >
-                                        {t("home_link")}
-                                    </NavLink>
-                                    {
-                                        user  && (<NavLink
+                                    {user && (
+                                        <NavLink
                                             className="navText"
-                                            href={route('feed.index',user.username)}
-                                            active={route().current('feed.index')}
+                                            href={user.role == "normal"?route('users_home',{lng:lang}):route('business.dashboard',{lng:lang})}
+                                            active={route().current('users_home') || route().current('welcome') || route().current('business.dashboard')}
                                         >
-                                        {t("social_media")}
-                                        </NavLink>)
+                                            {t("home_link")}
+                                        </NavLink>
+                                    )}
+                                    {
+                                        user && user.role == 'normal' && (<>
+                                            <NavLink
+                                                className="navText"
+                                                href={route('feed.index',user.username)}
+                                                active={route().current('feed.index')}
+                                            >
+                                                {t("social_media")}
+                                            </NavLink>
+                                            <NavLink
+                                                className="navText"
+                                                href={route('users_home')}
+                                                active={route().current('d')}
+                                            >
+                                                {t("market")}
+                                            </NavLink>
+                                        </>)
                                     }
-                                    <NavLink
-                                        className="navText"
-                                        href={route('users_home')}
-                                        active={route().current('d')}
-                                    >
-                                        {t("market")}
-                                    </NavLink>
                             </div>
                         </div>
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
@@ -181,26 +185,31 @@ export default function Navbar({lang,user}){
                 >
                                         
                     <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('users_home')}
-                            active={route().current('users_home') || route().current('welcome')}
-                        >
-                            {t("home_link")}
-                        </ResponsiveNavLink>
                         {
-                            user && 
+                            user &&
                             <ResponsiveNavLink
-                            href={route('feed.index',user.username)}
-                            active={route().current('feed.index')}>
-                                {t("social_media")}
+                            href={user.role == "normal"?route('users_home',{lng:lang}):route('business.dashboard',{lng:lang})}
+                            active={route().current('users_home') || route().current('welcome') || route().current("business.dashboard")}
+                            >
+                                {t("home_link")}
                             </ResponsiveNavLink>
                         }
-                        <ResponsiveNavLink
-                            href={route('users_home')}
-                            active={route().current('a')}
-                        >
-                            {t("market")}
-                        </ResponsiveNavLink>
+                        {
+                            user && user.role!="business" &&
+                            <>
+                                <ResponsiveNavLink
+                                    href={route('feed.index',user.username)}
+                                    active={route().current('feed.index')}>
+                                        {t("social_media")}
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('users_home')}
+                                    active={route().current('a')}
+                                >
+                                    {t("market")}
+                                </ResponsiveNavLink>
+                            </>
+                        }
                     </div>
 
                     {

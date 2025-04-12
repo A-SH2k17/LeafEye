@@ -17,6 +17,10 @@ export default function Register() {
         password_confirmation: '',
         username:'',
         customerType:'',
+        storeName:'',
+        storeAddress:'',
+        commercialRegistrationNumber:'',
+        storeType:'',
     });
 
     const [step, setStep] = useState(1);
@@ -297,7 +301,8 @@ export default function Register() {
                     
                     <div className="mb-4">
                     <label className="block mb-1">Store Address</label>
-                    <textarea
+                    <input
+                        type="text"
                         value={data.storeAddress}
                         onChange={e => setData('storeAddress', e.target.value)}
                         className="w-full p-2 border rounded"
@@ -309,29 +314,35 @@ export default function Register() {
                     </div>
                     
                     <div className="mb-4">
-                    <label className="block mb-1">Store Phone</label>
+                    <label className="block mb-1">Commercial Registration Number</label>
                     <input
                         type="text"
-                        value={data.storePhone}
-                        onChange={e => setData('storePhone', e.target.value)}
+                        value={data.commercialRegistrationNumber}
+                        onChange={e => setData('commercialRegistrationNumber', e.target.value)}
                         className="w-full p-2 border rounded"
                         required
                     />
-                    {errors.storePhone && (
-                        <div className="text-red-500 text-sm mt-1">{errors.storePhone}</div>
+                    {errors.commercialRegistrationNumber && (
+                        <div className="text-red-500 text-sm mt-1">{errors.commercialRegistrationNumber}</div>
                     )}
                     </div>
                     
                     <div className="mb-4">
-                    <label className="block mb-1">Store Description</label>
-                    <textarea
-                        value={data.storeDescription}
-                        onChange={e => setData('storeDescription', e.target.value)}
+                    <label className="block mb-1">Store Type</label>
+                    <select
+                        value={data.storeType}
+                        onChange={e => setData('storeType', e.target.value)}
                         className="w-full p-2 border rounded"
                         required
-                    />
-                    {errors.storeDescription && (
-                        <div className="text-red-500 text-sm mt-1">{errors.storeDescription}</div>
+                    >
+                        <option value="">Select store type</option>
+                        <option value="fertilizer">Fertilizer Store</option>
+                        <option value="seed">Seed Store</option>
+                        <option value="tools">Farming Tools Store</option>
+                        <option value="accessory">Farming Accessory Store</option>
+                    </select>
+                    {errors.storeType && (
+                        <div className="text-red-500 text-sm mt-1">{errors.storeType}</div>
                     )}
                     </div>
                 </div>
