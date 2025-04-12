@@ -48,6 +48,7 @@ export default function BusinessDashboard({ auth,lng}) {
         <AuthenticatedLayout
             lang = {lang}
         >
+            {/**Test github  */}
             <Head title="Business Dashboard" />
             <select value={lang} onChange={handleChange} className='m-4 mt-20'>
                     {languages.map((item) => {
