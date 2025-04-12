@@ -9,7 +9,7 @@ import { ChevronUp, ChevronDown, RefreshCw, DollarSign, Package, TrendingUp, Plu
 import PrimaryButton from '@/Components/Primitive/PrimaryButton';
 import SecondaryButton from '@/Components/Primitive/SecondaryButton';
 
-export default function BusinessDashboard({ auth,lng,shop}) {
+export default function BusinessDashboard({auth,shop,products}) {
 
     //code to save csrf and beareer token to avoid the 419 and 401 error in post
         useEffect(() => {
@@ -49,24 +49,7 @@ export default function BusinessDashboard({ auth,lng,shop}) {
 
 
          // Sample data
-         const [inventoryData, setInventoryData] = useState([
-            { id: 1, name: "Tomato Seeds", stock: 150, price: 2 },
-            { id: 2, name: "Carrot Seeds", stock: 200, price: 1.5 },
-            { id: 3, name: "Lettuce Seeds", stock: 180, price: 1.2 },
-            { id: 4, name: "Spinach Seeds", stock: 160, price: 1.3 },
-            { id: 5, name: "Cucumber Seeds", stock: 140, price: 1.8 },
-            { id: 6, name: "Pumpkin Seeds", stock: 100, price: 2.5 },
-            { id: 7, name: "Watermelon Seeds", stock: 90, price: 3 },
-            { id: 8, name: "Chili Pepper Seeds", stock: 170, price: 2.2 },
-            { id: 9, name: "Onion Seeds", stock: 130, price: 1.6 },
-            { id: 10, name: "Broccoli Seeds", stock: 120, price: 2 },
-            { id: 11, name: "Corn Seeds", stock: 110, price: 2.4 },
-            { id: 12, name: "Pea Seeds", stock: 115, price: 1.9 },
-            { id: 13, name: "Cauliflower Seeds", stock: 105, price: 2.1 },
-            { id: 14, name: "Beetroot Seeds", stock: 125, price: 1.7 },
-            { id: 15, name: "Radish Seeds", stock: 135, price: 1.4 },
-            { id: 16, name: "Zucchini Seeds", stock: 145, price: 2.3 },
-        ]);
+         const [inventoryData, setInventoryData] = useState(products);
         
 
         const salesData = [
@@ -80,8 +63,8 @@ export default function BusinessDashboard({ auth,lng,shop}) {
 
         // Calculated metrics
         const totalSales = salesData.reduce((sum, item) => sum + item.sales, 0);
-        const totalInventoryValue = inventoryData.reduce((sum, item) => sum + (item.stock * item.price), 0);
-        const totalItems = inventoryData.reduce((sum, item) => sum + item.stock, 0);
+        const totalInventoryValue = inventoryData.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+        const totalItems = inventoryData.reduce((sum, item) => sum + item.quantity, 0);
         
         // State for filtering and sorting
         const [sortField, setSortField] = useState('name');
@@ -90,18 +73,17 @@ export default function BusinessDashboard({ auth,lng,shop}) {
         const [selectedTimeRange, setSelectedTimeRange] = useState('6M');
 
         // Sort inventory data
-        const sortedInventory = [...inventoryData].sort((a, b) => {
-            if (sortDirection === 'asc') {
-            return a[sortField] > b[sortField] ? 1 : -1;
-            } else {
-            return a[sortField] < b[sortField] ? 1 : -1;
-            }
-        });
+        const sortedInventory = React.useMemo(() => {
+            return [...inventoryData].sort((a, b) => {
+              if (sortDirection === 'asc') {
+                return a[sortField] > b[sortField] ? 1 : -1;
+              } else {
+                return a[sortField] < b[sortField] ? 1 : -1;
+              }
+            });
+          }, [inventoryData, sortField, sortDirection]);
 
-        // Filter inventory data by category
-        const filteredInventory = activeCategory === 'All' 
-            ? sortedInventory 
-            : sortedInventory.filter(item => item.category === activeCategory);
+        
 
         // Handle sorting
         const handleSort = (field) => {
@@ -125,11 +107,11 @@ export default function BusinessDashboard({ auth,lng,shop}) {
             }
         };
 
-        const updateStock = (id, increment) => {
+        const updatequantity = (id, increment) => {
             setInventoryData(prevData =>
               prevData.map(item => {
                 if (item.id === id) {
-                  return { ...item, stock: increment ? item.stock + 1 : Math.max(0, item.stock - 1) };
+                  return { ...item, quantity: increment ? item.quantity + 1 : Math.max(0, item.quantity - 1) };
                 }
                 return item;
               })
@@ -154,8 +136,8 @@ export default function BusinessDashboard({ auth,lng,shop}) {
                     })}
             </select>
             <div className='p-4'>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">{shop[0].name} - Inventory Management</h1>
-                <h2 className='text-xl sm:2xl md:3xl font-semibold'>{shop[0].type}</h2>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">{shop.name} - Inventory Management</h1>
+                <h2 className='text-xl sm:2xl md:3xl font-semibold'>{shop.type}</h2>
             </div>
         
             <div className="max-w-7xl mx-auto text-center">
@@ -204,7 +186,7 @@ export default function BusinessDashboard({ auth,lng,shop}) {
                     <Package size={24} className="text-purple-600" />
                     </div>
                     <div>
-                    <h3 className="text-gray-500 text-sm">Items in Stock</h3>
+                    <h3 className="text-gray-500 text-sm">Items in quantity</h3>
                     <p className="text-2xl font-bold">{totalItems.toLocaleString()}</p>
                     <p className="text-sm text-gray-500">{Math.round(totalItems / inventoryData.length)} avg per product</p>
                     </div>
@@ -281,21 +263,21 @@ export default function BusinessDashboard({ auth,lng,shop}) {
         </tr>
       </thead>
       <tbody className="text-gray-700">
-        {filteredInventory.map((item) => (
+        {sortedInventory.map((item) => (
           <tr key={item.id} className="border-t border-gray-100 hover:bg-gray-50">
             <td className="p-4 font-medium">{item.name}</td>
             <td className="p-4">
               <div className="flex items-center justify-center space-x-2">
-                <span className="text-lg font-medium">{item.stock}</span>
+                <span className="text-lg font-medium">{item.quantity}</span>
                 <div className="flex">
                   <button 
-                    onClick={() => updateStock(item.id, true)}
+                    onClick={() => updatequantity(item.id, true)}
                     className="bg-green-500 text-white rounded-l p-1 hover:bg-green-600"
                   >
                     <Plus size={16} />
                   </button>
                   <button 
-                    onClick={() => updateStock(item.id, false)}
+                    onClick={() => updatequantity(item.id, false)}
                     className="bg-red-500 text-white rounded-r p-1 hover:bg-red-600"
                   >
                     <Minus size={16} />
@@ -304,11 +286,11 @@ export default function BusinessDashboard({ auth,lng,shop}) {
               </div>
             </td>
             <td className="p-4 text-center">${item.price}</td>
-            <td className="p-4 text-center">${(item.stock * item.price).toLocaleString()}</td>
+            <td className="p-4 text-center">${(item.quantity * item.price).toLocaleString()}</td>
             <td className="p-4">
               <div className="flex justify-center space-x-2">
                 <PrimaryButton>
-                    Update Stock
+                    Update quantity
                 </PrimaryButton>
                 <SecondaryButton className='bg-red-500 text-white hover:bg-red-300 hover:text-black'>
                     Delete
@@ -324,7 +306,7 @@ export default function BusinessDashboard({ auth,lng,shop}) {
     </table>
   </div>
   <div className="p-4 border-t border-gray-100 text-sm text-gray-500">
-    Showing {filteredInventory.length} of {inventoryData.length} products
+    Showing {sortedInventory.length} of {inventoryData.length} products
   </div>
 </div>
         </AuthenticatedLayout>

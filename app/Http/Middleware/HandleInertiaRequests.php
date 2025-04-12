@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Product;
 use App\Models\Shop;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -42,15 +43,28 @@ class HandleInertiaRequests extends Middleware
         ]);
         
         $userShop = null;
+        $products = null;
 
-        if ($request->user() != null && $request->user()->role=="business"){
-            $userShop = Shop::where('user_id',$request->user()->id)->first();
+        if ($request->user() != null && $request->user()->role == "business") {
+            $userShop = Shop::where('user_id', $request->user()->id)->first();
+            $products_db = Product::where('shop_id', $userShop->id)->get();
+            
+            $products = [];
+            foreach ($products_db as $product) {
+                array_push($products, [
+                    'id'=>$product->id,
+                    'name' => $product->name,
+                    'quantity' => $product->quantity,
+                    'price' => $product->price,
+                    'image_path' => $product->image_path,
+                ]);
+            }
         }
+        
         return [
             ...parent::share($request),
-            'shop'=> [
-                $userShop
-            ],
+            'shop'=> $userShop,
+            'products'=>$products,
             'auth' => [
                 'user' => $request->user(),
             ],
