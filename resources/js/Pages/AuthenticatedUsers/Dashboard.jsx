@@ -9,7 +9,6 @@ import Footer from '@/Components/NonPrimitive/Footer';
 
 export default function Dashboard(props) {
 
-
     //code to save csrf and beareer token to avoid the 419 and 401 error in post
     useEffect(() => {
         // Extract CSRF token from URL parameters

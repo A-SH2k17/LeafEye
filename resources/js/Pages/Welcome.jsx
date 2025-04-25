@@ -10,9 +10,11 @@ import features from '@/dummyJson/features.jsx';
 import Footer from '@/Components/NonPrimitive/Footer.jsx';
 import { useLanguage } from '@/multilanguage.js';
 
+
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
    
-    
+  
+
     const {lang,handleChange,languages} = useLanguage();
     const {t} = useTranslation();
     // Responsive carousel code
@@ -21,6 +23,34 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const [visibleCards, setVisibleCards] = useState(3);
     const intervalRef = useRef(null);
     const carouselRef = useRef(null);
+
+    useEffect(() => {
+        // Method 1: Using performance.navigation (older browsers)
+        // Type 2 represents back/forward navigation
+        const checkNavigationType = () => {
+            let isBackForward = false;
+            
+            // Check if performance.navigation is available
+            if (window.performance && window.performance.navigation) {
+                isBackForward = window.performance.navigation.type === 2;
+            }
+            
+            // Use the History API's state to detect back/forward (newer browsers)
+            // If history.state has a specific property set by your app, you can check it
+            // Or you can use the newer Navigation API if available
+            if (window.navigation && window.navigation.type) {
+                isBackForward = window.navigation.type === 'back_forward';
+            }
+            
+            // Show alert if back/forward navigation detected
+            if (isBackForward) {
+                window.location.reload()
+            }
+        };
+        
+        // Run the navigation check when component mounts
+        checkNavigationType();
+    }, [t]);
 
     // Responsive card count based on screen size
     useEffect(() => {

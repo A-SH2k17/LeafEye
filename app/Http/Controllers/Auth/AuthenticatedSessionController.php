@@ -28,7 +28,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
         $request->authenticate();
 
@@ -40,16 +40,20 @@ class AuthenticatedSessionController extends Controller
         
         // Redirect based on user type
         if ($user->role == "business") {
-            return redirect()->intended(route('business.dashboard', [
-                'csrfToken' => csrf_token(),
-                'bearer_token' => $token
-            ], absolute: false));
+            return Inertia::location(
+                route('business.dashboard', [
+                    'csrfToken' => csrf_token(),
+                    'bearer_token' => $token
+                ])
+            );
         }
         
-        return redirect()->intended(route('users_home', [
-            'csrfToken' => csrf_token(),
-            'bearer_token' => $token
-        ], absolute: false));
+        return Inertia::location(
+            route('users_home', [
+                'csrfToken' => csrf_token(),
+                'bearer_token' => $token
+            ])
+        );
     }
 
     /**
@@ -67,6 +71,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return Inertia::location(route('welcome'));
     }
 }
