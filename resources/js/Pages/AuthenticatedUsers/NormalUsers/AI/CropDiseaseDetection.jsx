@@ -64,17 +64,22 @@ export default function CropDiseaseDetection(){
                 }
             });
             if (response.data.success) {
+                let prediction = response.data.disease.split("___")
                 let detect = {
-                    "disease":response.data.disease,
+                    "plantType":prediction[0],
+                    "disease":prediction[1],
                     "confidence": response.data.confidence,
-                    "recommendations": response.data.recommendations
+                    "recommendations": response.data.recommendations,
+                    "description":response.data.description,
                 }
                 console.log(detect);
+                console.log(prediction)
                 setDetectionResult(detect);
             } else {
                 setError(response.data.message || "Failed to detect disease");
             }
         } catch (err) {
+            console.log(err)
             setError(err.response?.data?.message || "An error occurred during disease detection");
         } finally {
             setIsLoading(false);
@@ -164,10 +169,24 @@ export default function CropDiseaseDetection(){
                                         <div className="bg-white p-6 rounded-lg shadow">
                                             <h3 className="text-xl font-bold mb-3">Detection Results</h3>
                                             
+
+                                            <div className="mb-4">
+                                                <h4 className="font-medium mb-1">Plant Type:</h4>
+                                                <p className="text-lg">{detectionResult.plantType || 'Unknown'}</p>
+                                            </div>
+
                                             <div className="mb-4">
                                                 <h4 className="font-medium mb-1">Disease:</h4>
                                                 <p className="text-lg">{detectionResult.disease || 'Unknown'}</p>
                                             </div>
+
+                                            {
+                                                detectionResult.description &&
+                                                <div className="mb-4">
+                                                    <h4 className="font-medium mb-1">About Disease:</h4>
+                                                    <p className="text-lg">{detectionResult.description || 'Unknown'}</p>
+                                                </div>
+                                            }
                                             
                                             {detectionResult.confidence && (
                                                 <div className="mb-4">
