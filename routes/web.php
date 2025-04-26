@@ -6,6 +6,7 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\NormalUser\FollowerController;
 use App\Http\Controllers\NormalUser\MessagesController;
 use App\Http\Controllers\NormalUser\PlantMonitorController;
+use App\Http\Controllers\OwnerController;
 use App\Models\Plant;
 use App\Models\Plant_Image;
 use App\Models\Plant_Monitor;
@@ -94,10 +95,13 @@ Route::middleware('auth')->controller(AiController::class)->group(function(){
 });
 
 // Business Owner Routes
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/business/dashboard', function () {
-        return Inertia::render('AuthenticatedUsers/BusinessOwners/Dashboard');
-    })->name('business.dashboard');
+Route::middleware(['auth', 'verified'])->controller(OwnerController::class)->group(function () {
+    Route::get('/business/dashboard','index')->name('business.dashboard');
+    Route::get('/business/add_product','showAddProduct')->name('business.add_product');
+    Route::post('/business/add_product','addProduct')->name('product.add');
+    Route::post('/business/updateQuantity/{item_id}/{quantity}','updateQuantity')->name('product.update_quantity');
+    Route::delete('/business/updateQuantity/{id}','deleteItem')->name('product.delete');
+    Route::get('/business/editItem/{item}','showEditItem')->name('prdouct.show_edit');
 });
 
 require __DIR__.'/auth.php';

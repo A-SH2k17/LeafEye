@@ -73,6 +73,7 @@ class HandleInertiaRequests extends Middleware
                 'throttle:api',
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
             ],
+            'success'=>session()->get("success"),
         ];
     }
 }

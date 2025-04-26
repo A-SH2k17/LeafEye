@@ -24,16 +24,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const intervalRef = useRef(null);
     const carouselRef = useRef(null);
 
+
+    //this code is used to force reload if back/forward action is done to go to this page
     useEffect(() => {
-        // Method 1: Using performance.navigation (older browsers)
         // Type 2 represents back/forward navigation
         const checkNavigationType = () => {
             let isBackForward = false;
-            
-            // Check if performance.navigation is available
-            if (window.performance && window.performance.navigation) {
-                isBackForward = window.performance.navigation.type === 2;
-            }
             
             // Use the History API's state to detect back/forward (newer browsers)
             // If history.state has a specific property set by your app, you can check it
@@ -50,7 +46,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         
         // Run the navigation check when component mounts
         checkNavigationType();
-    }, [t]);
+    }, []);
 
     // Responsive card count based on screen size
     useEffect(() => {
@@ -70,7 +66,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         // Add event listener
         window.addEventListener('resize', handleResize);
 
-        // Clean up
+        // Clean up to prevent the effect from constantly running
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
@@ -222,6 +218,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     <div 
                         className="relative" 
                         ref={carouselRef}
+                        onPointerEnter={handleMouseEnter}
+                        onPointerLeave={handleMouseLeave}
                     >
                         
                         

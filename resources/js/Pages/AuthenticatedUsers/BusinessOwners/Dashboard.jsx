@@ -1,6 +1,6 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { useEffect ,useState} from 'react';
 import { useLanguage } from '@/multilanguage';
 import { useTranslation } from 'react-i18next';
@@ -8,8 +8,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { ChevronUp, ChevronDown, RefreshCw, DollarSign, Package, TrendingUp, Plus, Minus } from 'lucide-react';
 import PrimaryButton from '@/Components/Primitive/PrimaryButton';
 import SecondaryButton from '@/Components/Primitive/SecondaryButton';
+import axios from 'axios';
 
-export default function BusinessDashboard({auth,shop,products}) {
+export default function BusinessDashboard({success,errors,auth,shop,products}) {
 
     //code to save csrf and beareer token to avoid the 419 and 401 error in post
         useEffect(() => {
@@ -47,11 +48,24 @@ export default function BusinessDashboard({auth,shop,products}) {
             const {t} = useTranslation();
 
 
+      
 
-         // Sample data
+         //inventory data
          const [inventoryData, setInventoryData] = useState(products);
-        
-
+         const [updateMap, setUpdateMap] = useState({});
+         useEffect(() => {
+          // Calculate the new map based on the current 'products'
+          const newMap = products.reduce((acc, product) => {
+            acc[product.name] = null;
+            return acc;
+          }, {});
+      
+          // Update the state *once* with the new map
+          setUpdateMap(newMap);
+      
+        }, [products]);
+         //console.log(updateMap)
+        //sample sales data 
         const salesData = [
             { month: 'Jan', sales: 5400 },
             { month: 'Feb', sales: 6200 },
@@ -107,7 +121,12 @@ export default function BusinessDashboard({auth,shop,products}) {
             }
         };
 
-        const updatequantity = (id, increment) => {
+        
+
+
+          //update quantity code
+
+          const updatequantity = (id, increment) => {
             setInventoryData(prevData =>
               prevData.map(item => {
                 if (item.id === id) {
@@ -117,6 +136,49 @@ export default function BusinessDashboard({auth,shop,products}) {
               })
             );
           };
+
+          const {data,setData,processing,post} = useForm({
+            id:null,
+            quantity:null,
+          });
+
+          const handleUpdate = async (id,quantity,name)=>{
+            try{
+              setData('id',id)
+              setData('quantity',quantity)
+              const formData = new FormData()
+              formData.append('id',id)
+              formData.append('quantity',quantity)
+              const response = await axios.post(`/business/updateQuantity/${id}/${quantity}`,formData,{
+                headers:{
+                  "Content-Type": "application/json",
+                  "X-CSRF-TOKEN": localStorage.getItem("csrf_token")
+                }
+              })
+              console.log(response.data)
+              setUpdateMap((prevMapp)=>{
+                return{
+                  ...prevMapp,
+                  [name]:response.data
+                }
+              })
+              //console.log(updateMap)
+            }catch(error){
+              alert(error)
+            }
+          }
+
+
+          //delete items
+          const handleDelete= async (id)=>{
+            try{
+              const response = await axios.delete(`/business/updateQuantity/${id}`)
+              setInventoryData(response.data.products)
+              console.log(response.data)
+            }catch(error){
+              console.log(error.response.data)
+            }
+          }
 
     return (
         <AuthenticatedLayout
@@ -146,6 +208,12 @@ export default function BusinessDashboard({auth,shop,products}) {
                         <h1 className="text-2xl font-bold mb-4">Welcome {auth.user.first_name}</h1>
                         <p>This is your business dashboard. Here you can manage your shop and products.</p>
                     </div>
+                    {
+                      (success || Object.keys(errors).length > 0) ? (
+                        <p className={success?'text-green-600':'text-red-500'}>{success?success:errors["message"]}</p>
+                      ):null
+                      
+                    }
                 </div>
             </div>
 
@@ -241,7 +309,7 @@ export default function BusinessDashboard({auth,shop,products}) {
 <div className="bg-white rounded-lg shadow-sm border border-gray-100">
   <div className="p-4 border-b border-gray-100">
     <div className="flex justify-between items-center">
-      <h2 className="text-lg font-semibold text-gray-800">Inventory List &nbsp; <PrimaryButton>Add Item To Inventory</PrimaryButton></h2>
+      <h2 className="text-lg font-semibold text-gray-800">Inventory List &nbsp; <Link href={route('business.add_product')}><PrimaryButton>Add Item To Inventory</PrimaryButton></Link></h2>
     </div>
   </div>
   <div className="overflow-x-auto">
@@ -265,7 +333,7 @@ export default function BusinessDashboard({auth,shop,products}) {
       <tbody className="text-gray-700">
         {sortedInventory.map((item) => (
           <tr key={item.id} className="border-t border-gray-100 hover:bg-gray-50">
-            <td className="p-4 font-medium">{item.name}</td>
+            <td className="p-4 font-medium">{item.name} {updateMap[item.name]?<p className={Object.keys(updateMap[item.name])[0]=="success"?'text-green-500':'text-red-500'}>{Object.keys(updateMap[item.name])[0]=="success"?updateMap[item.name]["success"]:updateMap[item.name]["error"]}</p>:<p>No</p>}</td>
             <td className="p-4">
               <div className="flex items-center justify-center space-x-2">
                 <span className="text-lg font-medium">{item.quantity}</span>
@@ -289,15 +357,17 @@ export default function BusinessDashboard({auth,shop,products}) {
             <td className="p-4 text-center">${(item.quantity * item.price).toLocaleString()}</td>
             <td className="p-4">
               <div className="flex justify-center space-x-2">
-                <PrimaryButton>
+                <PrimaryButton onClick={()=>{handleUpdate(item.id,item.quantity,item.name)}}>
                     Update quantity
                 </PrimaryButton>
-                <SecondaryButton className='bg-red-500 text-white hover:bg-red-300 hover:text-black'>
+                <SecondaryButton onClick={()=>{handleDelete(item.id)}}className='bg-red-500 text-white hover:bg-red-300 hover:text-black'>
                     Delete
                 </SecondaryButton>
-                <SecondaryButton className='bg-gray-100 hover:bg-gray-50'>
-                    Edit Item
-                </SecondaryButton>
+                <Link href={`/business/editItem/${item.name}`}>
+                  <SecondaryButton className='bg-gray-100 hover:bg-gray-50'>
+                      Edit Item
+                  </SecondaryButton>
+                </Link>
               </div>
             </td>
           </tr>

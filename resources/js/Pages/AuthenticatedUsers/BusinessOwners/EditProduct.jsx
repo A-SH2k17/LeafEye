@@ -10,23 +10,23 @@ import TextInput from "@/Components/Primitive/TextInput";
 import { Textarea } from "@headlessui/react";
 import PrimaryButton from "@/Components/Primitive/PrimaryButton";
 
-export default function AddProduct({auth,shop}){
+export default function EditProduct({auth,shop,product}){
     //multilangiage code
     const {lang,handleChange,languages} = useLanguage();
     const {t} = useTranslation();
 
     //form data
     const {data,setData,reset,errors,processing,post}= useForm({
-        image:'',
-        product_name:'',
-        quantity:'',
-        Description:'',
-        price:'',
+        image:product.image_path,
+        product_name:product.name,
+        quantity:product.quantity,
+        Description:product.description,
+        price:product.price,
         shop_id:shop.id,
     })
 
     //code for image input
-    const [previewImage,setPreviewImage] = useState(null);
+    const [previewImage,setPreviewImage] = useState(`/storage/${product.image_path}`);
     const handleImageChange = (e)=>{
         const file = e.target.files[0];
         
@@ -34,6 +34,7 @@ export default function AddProduct({auth,shop}){
             setData('image',file)
             const reader = new FileReader();
             reader.onload= (e)=>{
+                alert(e.target.result)
                 setPreviewImage(e.target.result)
             }
             reader.readAsDataURL(file)
@@ -42,6 +43,7 @@ export default function AddProduct({auth,shop}){
 
     const handleSubmit = (e)=>{
         e.preventDefault()
+        alert("cll")
         if(Object.values(data).some(value=>value===null) || Object.values(data).some(value=>value==='')){
             alert("Please fill every input in the form")
         }else if(isNaN(Number(data.price))){
@@ -51,7 +53,7 @@ export default function AddProduct({auth,shop}){
             formData.append('image', data.image);
             formData.append('product_name', data.product_name);
             formData.append('quantity', data.quantity);
-            formData.append('Description', data.Description);
+            formData.append('Description', data.description);
             formData.append('price', data.price);
             formData.append('shop_id',data.shop_id)
 
@@ -217,6 +219,7 @@ export default function AddProduct({auth,shop}){
                                 </PrimaryButton>
                             </div>
                         </form>
+                        <button onClick={()=>alert(previewImage)}>Test</button>
                     </div>
                 </div>
             </div>
