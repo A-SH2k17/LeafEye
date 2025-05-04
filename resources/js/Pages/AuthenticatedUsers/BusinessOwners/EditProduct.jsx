@@ -22,7 +22,7 @@ export default function EditProduct({auth,shop,product}){
         quantity:product.quantity,
         Description:product.description,
         price:product.price,
-        shop_id:shop.id,
+        id:product.id,
     })
 
     //code for image input
@@ -43,7 +43,6 @@ export default function EditProduct({auth,shop,product}){
 
     const handleSubmit = (e)=>{
         e.preventDefault()
-        alert("cll")
         if(Object.values(data).some(value=>value===null) || Object.values(data).some(value=>value==='')){
             alert("Please fill every input in the form")
         }else if(isNaN(Number(data.price))){
@@ -54,10 +53,11 @@ export default function EditProduct({auth,shop,product}){
             formData.append('product_name', data.product_name);
             formData.append('quantity', data.quantity);
             formData.append('Description', data.description);
-            formData.append('price', data.price);
-            formData.append('shop_id',data.shop_id)
+            //formData.append('price', data.price);
+            //formData.append('id',data.product);
+            
 
-            post(route('product.add'),formData),{
+            post(route('product.edit'),formData),{
                 formData:true,
             };
         }
@@ -66,12 +66,12 @@ export default function EditProduct({auth,shop,product}){
 
     return(
         <AuthenticatedLayout>
-            <Head title="Add Product"/>
+            <Head title="Edit Product"/>
             
             <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center my-10">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800">{shop.name} - Add Product</h1>
+                        <h1 className="text-3xl font-bold text-gray-800">{shop.name} - Edit Product</h1>
                         <h2 className="text-xl mt-1 text-gray-600 font-medium">{shop.type}</h2>
                     </div>
                     <select value={lang} onChange={handleChange} className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
@@ -86,7 +86,14 @@ export default function EditProduct({auth,shop,product}){
                 <div className="bg-white rounded-lg shadow-xl overflow-hidden">
                     <div className="p-6 bg-green-50 border-b border-gray-200">
                         <h3 className="text-lg font-medium text-gray-900">Product Information</h3>
-                        <p className="mt-1 text-sm text-gray-500">Please fill in the details for your new product.</p>
+                        <p className="mt-1 text-sm text-gray-500">Please fill in the details to edit your product.</p>
+                        {Object.keys(errors).length > 0 &&(
+                            <>
+                            {console.log(Object.keys(errors))}
+                            {(Object.keys(errors)).map((message)=>(<p className="text-red-500">{errors[message]}</p>))}
+                            </>
+                            
+                        )}
                     </div>
 
                     <div className="p-6">
@@ -215,11 +222,10 @@ export default function EditProduct({auth,shop,product}){
 
                             <div className="flex justify-end space-x-3 pt-5">
                                 <PrimaryButton type="submit">
-                                    Add
+                                    Save
                                 </PrimaryButton>
                             </div>
                         </form>
-                        <button onClick={()=>alert(previewImage)}>Test</button>
                     </div>
                 </div>
             </div>

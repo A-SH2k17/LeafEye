@@ -102,6 +102,7 @@ Route::middleware(['auth', 'verified'])->controller(OwnerController::class)->gro
     Route::post('/business/updateQuantity/{item_id}/{quantity}','updateQuantity')->name('product.update_quantity');
     Route::delete('/business/updateQuantity/{id}','deleteItem')->name('product.delete');
     Route::get('/business/editItem/{item}','showEditItem')->name('prdouct.show_edit');
+    Route::post('/business/editItem','editProduct')->name('product.edit');
 });
 
 require __DIR__.'/auth.php';
