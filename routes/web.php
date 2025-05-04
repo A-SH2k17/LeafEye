@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-
+Route::post('/test',function(){
+    return 'yes';
+});
 
 //welcome page and default routes
 Route::get('/', function () {
@@ -109,8 +111,8 @@ Route::middleware(['auth', 'verified'])->controller(OwnerController::class)->gro
 
 // Fertilizer recommendation route
 Route::middleware('auth')->controller(FertRecomController::class)->group(function(){
-    Route::get('/recommendFertilizer','recommendation_index')->name('ai.recommendation_index');
-
+    Route::get('/{user}/recommendFertilizer','recommendation_index')->name('ai.recommendation_index');
+    Route::post('/{user}/recommendFertilizer','recommend')->name('ai.recommend');
 
 });
 

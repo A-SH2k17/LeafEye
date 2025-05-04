@@ -214,11 +214,13 @@ export default function Dashboard(props) {
             <div className="p-6 md:p-10 bg-[]">
                 <div className="flex flex-col-reverse md:flex-row gap-8">
                     <div className="md:w-1/2 flex justify-center md:justify-start items-center">
+                        <Link href={`${props.auth.user.username}/recommendFertilizer`}>
                             <PrimaryButton
                                 className='h-16'
                             >
                                 {t("recommend_button")}
                             </PrimaryButton>
+                        </Link>
                     </div>
                     
                     <div className="md:w-1/2">
