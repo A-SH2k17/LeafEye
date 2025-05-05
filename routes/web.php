@@ -87,6 +87,7 @@ Route::middleware('auth')->controller(PlantMonitorController::class)->group(func
     Route::get('/plantMonitor/{user}/addImage','imageAdd')->name('montor.add_plant_image');
     Route::post('/image/add','addPlantImage')->name('montor.add_plant_image_action');
     Route::post('/plant/add','addPlantDB')->name('monitor.add_plant_submit');
+    Route::get('/plant/image','showImage_index')->name('monitor.monitor_plant');
 });
 
 
@@ -113,5 +114,8 @@ Route::middleware('auth')->controller(FertRecomController::class)->group(functio
 
 
 });
+
+
+
 
 require __DIR__.'/auth.php';

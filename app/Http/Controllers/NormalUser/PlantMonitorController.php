@@ -27,6 +27,12 @@ class PlantMonitorController extends Controller
     function imageAdd(){
         return Inertia::render('AuthenticatedUsers/NormalUsers/PlantsMonitoring/AddPlantImage');
     }
+    
+    // function to show the monitored plant
+    function showImage_index(){
+        return Inertia::render('AuthenticatedUsers/NormalUsers/PlantsMonitoring/Monitor');
+
+    }
 
 
     //function to add plant to database
