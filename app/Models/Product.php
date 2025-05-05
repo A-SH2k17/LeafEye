@@ -15,7 +15,8 @@ class Product extends Model
         'image_path',
         'price',
         'quantity',
-        'shop_id'
+        'shop_id',
+        'description'
     ];
 
     public function orderProductDetails(){

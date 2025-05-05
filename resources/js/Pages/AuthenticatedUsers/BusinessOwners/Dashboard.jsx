@@ -89,10 +89,13 @@ export default function BusinessDashboard({success,errors,auth,shop,products}) {
         // Sort inventory data
         const sortedInventory = React.useMemo(() => {
             return [...inventoryData].sort((a, b) => {
+              const aValue = a[sortField].toLowerCase()
+              const bValue = b[sortField].toLowerCase()
+
               if (sortDirection === 'asc') {
-                return a[sortField] > b[sortField] ? 1 : -1;
+                return aValue > bValue ? 1 : -1;
               } else {
-                return a[sortField] < b[sortField] ? 1 : -1;
+                return aValue < bValue ? 1 : -1;
               }
             });
           }, [inventoryData, sortField, sortDirection]);
@@ -333,7 +336,7 @@ export default function BusinessDashboard({success,errors,auth,shop,products}) {
       <tbody className="text-gray-700">
         {sortedInventory.map((item) => (
           <tr key={item.id} className="border-t border-gray-100 hover:bg-gray-50">
-            <td className="p-4 font-medium">{item.name} {updateMap[item.name]?<p className={Object.keys(updateMap[item.name])[0]=="success"?'text-green-500':'text-red-500'}>{Object.keys(updateMap[item.name])[0]=="success"?updateMap[item.name]["success"]:updateMap[item.name]["error"]}</p>:<p>No</p>}</td>
+            <td className="p-4 font-medium">{item.name} {updateMap[item.name]?<p className={Object.keys(updateMap[item.name])[0]=="success"?'text-green-500':'text-red-500'}>{Object.keys(updateMap[item.name])[0]=="success"?updateMap[item.name]["success"]:updateMap[item.name]["error"]}</p>:null}</td>
             <td className="p-4">
               <div className="flex items-center justify-center space-x-2">
                 <span className="text-lg font-medium">{item.quantity}</span>

@@ -36,8 +36,8 @@ class OwnerController extends Controller
             //return $request;
             $validator = Validator::make($request->all(), [
                 'product_name' => 'required|string|max:255',
-                'quantity' => 'required|integer',
-                'price' => 'required|numeric',
+                'quantity' => 'required|integer|min:1',
+                'price' => 'required|numeric|min:0.01',
                 'image' => 'required|image|max:2048',
                 'Description' => 'required|string',
                 'shop_id'=>'required|exists:shops,id'
@@ -63,6 +63,7 @@ class OwnerController extends Controller
                 "price"=>$request->price,
                 "shop_id"=>$request->shop_id,
                 "quantity"=>$request->quantity,
+                "description"=>$request->Description,
             ]);
             return redirect()->route("business.dashboard")->with("success","Product Added Succesfully");
         }catch(Exception $e){
@@ -110,6 +111,61 @@ class OwnerController extends Controller
     }
 
 
+    function editProduct(Request $request){
+        try{
+            //return $request;
+            
+            $validator = Validator::make($request->all(), [
+                'product_name' => 'required|string|max:255',
+                'quantity' => 'required|integer|min:1',
+                'price' => 'required|numeric|min:0.01',
+                'image' => 'required',
+                'Description' => 'required|string',
+                'id'=>'required'
+            ]);
+
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput();
+            }
+
+            //return $request;
+            $product = Product::where('id',$request->id)->first();
+            $nothingChanged = $request->product_name==$product->name && $request->image == $product->image_path && $product->description == $request->Description && $product->price == $request->price && $product->quantity == $request->quantity;
+            if($nothingChanged){
+                return redirect()->back()->withErrors(["message"=>"Error:Please Modify any field to update your product"]);
+            }
+            
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store("product_images/{$request->shop_id}", 'public');
+            }
+    
+            if($request->product_name!=$product->name){
+                $product->name = $request->product_name;
+                $product->save();
+            }
+            if($request->price!=$product->price){
+                $product->price = $request->price;
+                $product->save();
+            }
+            if($request->Description!=$product->description){
+                $product->description = $request->Description;
+                $product->save();
+            }
+            if($request->quantity!=$product->quantity){
+                $product->quantity = $request->quantity;
+                $product->save();
+            }
+            if($request->image!=$product->image_path){
+                $product->image_path = $imagePath;
+                $product->save();
+            }
+
+            return redirect()->route("business.dashboard")->with("success","Product Edited Succesfully");
+        }catch(Exception $e){
+            return back()->with("error",$e->getMessage());
+        }
+    }
 
     
 }
