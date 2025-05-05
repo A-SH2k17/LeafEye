@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Camera } from 'lucide-react';
 import { Head, useForm } from "@inertiajs/react";
-import UnauthenticatedLayout from "@/Layouts/UnauthenticatedLayout";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Footer from "@/Components/NonPrimitive/Footer";
 
 export default function PlantMonitor() {
@@ -109,7 +109,7 @@ export default function PlantMonitor() {
   return (
     <>
       <Head title={t('title')} />
-      <UnauthenticatedLayout lang={lang}>
+      <AuthenticatedLayout lang={lang}>
         <div className="flex justify-end p-4 pt-20">
           <select 
             value={lang} 
@@ -181,7 +181,7 @@ export default function PlantMonitor() {
           </main>
         </div>
         <Footer lang={lang} />
-      </UnauthenticatedLayout>
+      </AuthenticatedLayout>
     </>
   );
 }
