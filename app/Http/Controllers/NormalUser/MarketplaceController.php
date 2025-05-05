@@ -11,4 +11,9 @@ class MarketplaceController extends Controller
     function viewShops_index(){
         return Inertia::render('AuthenticatedUsers/NormalUsers/Ecommerce/MarketPlace');
     }
+
+    function viewProducts_index(){
+        return Inertia::render('AuthenticatedUsers/NormalUsers/Ecommerce/MarketPlaceProduct');
+    }
+
 }

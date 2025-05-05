@@ -121,6 +121,8 @@ Route::middleware('auth')->controller(FertRecomController::class)->group(functio
 // Market place route
 Route::middleware('auth')->controller(MarketplaceController::class)->group(function(){
     Route::get('/market/shops','viewShops_index')->name('market.viewShops_index');
+    Route::get('/market/products','viewProducts_index')->name('market.viewProducts_index');
+
 
 });
 
