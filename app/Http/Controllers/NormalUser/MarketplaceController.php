@@ -16,4 +16,13 @@ class MarketplaceController extends Controller
         return Inertia::render('AuthenticatedUsers/NormalUsers/Ecommerce/MarketPlaceProduct');
     }
 
+    function checkout_index(){
+        return Inertia::render('AuthenticatedUsers/NormalUsers/Ecommerce/CheckoutDetails');
+    }
+
+    function creditInfo_index(){
+        return Inertia::render('AuthenticatedUsers/NormalUsers/Ecommerce/CreditCardInfo');
+    }
+
+
 }
