@@ -8,6 +8,7 @@ use App\Http\Controllers\NormalUser\FollowerController;
 use App\Http\Controllers\NormalUser\MessagesController;
 use App\Http\Controllers\NormalUser\PlantMonitorController;
 use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\MarketplaceController;
 use App\Models\Plant;
 use App\Models\Plant_Image;
 use App\Models\Plant_Monitor;
@@ -114,6 +115,12 @@ Route::middleware(['auth', 'verified'])->controller(OwnerController::class)->gro
 Route::middleware('auth')->controller(FertRecomController::class)->group(function(){
     Route::get('/{user}/recommendFertilizer','recommendation_index')->name('ai.recommendation_index');
     Route::post('/{user}/recommendFertilizer','recommend')->name('ai.recommend');
+
+});
+
+// Market place route
+Route::middleware('auth')->controller(MarketplaceController::class)->group(function(){
+    Route::get('/market/shops','viewShops_index')->name('market.viewShops_index');
 
 });
 
