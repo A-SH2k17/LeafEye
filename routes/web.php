@@ -7,6 +7,7 @@ use App\Http\Controllers\NormalUser\FollowerController;
 use App\Http\Controllers\NormalUser\MessagesController;
 use App\Http\Controllers\NormalUser\PlantMonitorController;
 use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\FertRecomController;
 use App\Models\Plant;
 use App\Models\Plant_Image;
 use App\Models\Plant_Monitor;
@@ -15,6 +16,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 
 
 //welcome page and default routes
@@ -103,6 +105,13 @@ Route::middleware(['auth', 'verified'])->controller(OwnerController::class)->gro
     Route::delete('/business/updateQuantity/{id}','deleteItem')->name('product.delete');
     Route::get('/business/editItem/{item}','showEditItem')->name('prdouct.show_edit');
     Route::post('/business/editItem','editProduct')->name('product.edit');
+});
+
+// Fertilizer recommendation route
+Route::middleware('auth')->controller(FertRecomController::class)->group(function(){
+    Route::get('/recommendFertilizer','recommendation_index')->name('ai.recommendation_index');
+
+
 });
 
 require __DIR__.'/auth.php';
