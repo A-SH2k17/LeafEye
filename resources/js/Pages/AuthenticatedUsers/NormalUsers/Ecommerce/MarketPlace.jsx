@@ -5,6 +5,7 @@ import { useLanguage } from '@/multilanguage';
 import { useTranslation } from 'react-i18next';
 import { Head } from '@inertiajs/react';
 import Footer from '@/Components/NonPrimitive/Footer';
+import BusinessCard from '@/Components/NonPrimitive/BusinessCard';
 // Main marketplace component
 export default function Marketplace() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -82,45 +83,3 @@ export default function Marketplace() {
 }
 
 
-// Business card component
-function BusinessCard({ business }) {
-  return (
-    <div className="bg-white shadow-sm rounded-lg overflow-hidden border border-gray-100">
-      <div className="p-4 flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="flex-shrink-0">
-            {/* Replace with actual logo or use an image placeholder */}
-            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-              <img 
-                src="/api/placeholder/64/64" 
-                alt={`${business.name} logo`}
-                className="w-12 h-12 object-contain"
-              />
-            </div>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-800">{business.name}</h3>
-            <div className="mt-1 flex flex-wrap gap-2">
-              {business.categories.map((category, index) => (
-                <span 
-                  key={index} 
-                  className="text-sm text-gray-600"
-                >
-                  {category}
-                  {index < business.categories.length - 1 && (
-                    <span className="mx-2">•</span>
-                  )}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div>
-          <button className="text-green-600 hover:text-green-700 font-medium">
-            View Products
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
