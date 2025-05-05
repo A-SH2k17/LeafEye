@@ -5,15 +5,15 @@ import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/multilanguage";
 import AuthenticatedLayout from "@/Layouts/UnauthenticatedLayout";
 import Footer from "@/Components/NonPrimitive/Footer";
+import axios from "axios";
 
-export default function FertilizerRecommendation() {
+export default function FertilizerRecommendation(props) {
     // Multilanguage code
     const { lang, handleChange, languages } = useLanguage();
     const { t } = useTranslation();
     
     // Form handling with Inertia's useForm
     const { data, setData, post, processing, errors, reset } = useForm({
-        district_name: '',
         soil_color: '',
         nitrogen: '',
         phosphorus: '',
@@ -32,24 +32,39 @@ export default function FertilizerRecommendation() {
     const cropTypes = ["Sugarcane", "Jowar", "Cotton", "Rice", "Wheat", "Groundnut", "Maize", "Tur", 
                      "Urad", "Moong", "Gram", "Masoor", "Soybean", "Ginger", "Turmeric", "Grapes"];
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         
-        // Use Inertia post instead of axios
-        post('/', {
-            preserveScroll: true,
-            onSuccess: (response) => {
-                // Access the response from the props
-                if (response?.props?.recommendation) {
-                    setRecommendation(response.props.recommendation);
+        const formData = new FormData();
+
+        formData.append('soil_color', data.soil_color);      // color
+        formData.append('crop', data.crop);                  // crop
+        formData.append('nitrogen', data.nitrogen);          // Nitrogen
+        formData.append('phosphorus', data.phosphorus);      // Phosphorus
+        formData.append('potassium', data.potassium);        // Potassium
+        formData.append('ph', data.ph);                      // pH
+        formData.append('rainfall', data.rainfall);          // Rainfall
+        formData.append('temperature', data.temperature);    // Temperature
+
+        try{
+            const response = await axios.post(`/${props.auth.user.username}/recommendFertilizer`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
                 }
-            },
-            onError: (errors) => {
-                setError(`Error: ${errors.message || 'Failed to get recommendation'}`);
-                console.error("Failed to fetch recommendation:", errors);
+            });
+            console.log(response.data)
+            if(response.data.success){
+               setRecommendation(response.data)
+            }else{
+                setError("failed to get recommednation")
             }
-        });
+            
+        }catch(err){
+            setError(err.response?.data?.message || "An error occurred during fertilizer recommendation from server");
+            console.log(err)
+        }
+        
     };
 
     return (
@@ -76,19 +91,6 @@ export default function FertilizerRecommendation() {
                         </a>
                         
                         <form onSubmit={handleSubmit} className="space-y-4 mt-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">{t('District Name')}</label>
-                                <input
-                                    type="text"
-                                    value={data.district_name}
-                                    onChange={e => setData('district_name', e.target.value)}
-                                    placeholder={t('Enter district name')}
-                                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
-                                />
-                                {errors.district_name && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.district_name}</p>
-                                )}
-                            </div>
                             
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">{t('Soil Color')}</label>
@@ -236,15 +238,16 @@ export default function FertilizerRecommendation() {
                         {recommendation && (
                             <div className="mt-6 p-4 bg-green-100 border border-green-200 rounded-md">
                                 <h2 className="text-lg font-semibold text-green-800 mb-2">{t('Recommended Fertilizer')}:</h2>
-                                <p className="text-green-700">{recommendation.fertilizer_name}</p>
-                                <p className="text-sm text-green-600 mt-2">{recommendation.description}</p>
+                                <p className="text-green-700">{recommendation.fertilizer}</p>
+                                <p className="text-sm text-green-900 mt-2">{recommendation.description}</p>
                                 <div className="mt-3">
-                                    <h3 className="text-md font-medium text-green-800">{t('Application Rate')}:</h3>
-                                    <p className="text-green-700">{recommendation.application_rate}</p>
+                                    <a href={recommendation.link}><h3 className="text-md font-medium text-green-800">{t('Link to take care of ')} {data.crop}</h3></a>
+                                    
                                 </div>
                             </div>
                         )}
                     </div>
+                    <button onClick={()=>{console.log(recommendation)}}>dfa</button>
                 </div>
                 <Footer lang={lang}/>
             </AuthenticatedLayout>

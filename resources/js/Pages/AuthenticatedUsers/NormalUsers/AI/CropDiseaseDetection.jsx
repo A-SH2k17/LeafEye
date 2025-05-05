@@ -1,5 +1,5 @@
 import Footer from "@/Components/NonPrimitive/Footer";
-import UnauthenticatedLayout from "@/Layouts/UnauthenticatedLayout";
+import AuthenticatedLayout from "@/Layouts/UnauthenticatedLayout";
 import { Head,useForm} from "@inertiajs/react";
 import React from "react";
 import { useEffect,useState } from "react";
@@ -89,7 +89,7 @@ export default function CropDiseaseDetection(){
     return(
         <>
         <Head title="AI Crop Disease Diagnostic"  />
-        <UnauthenticatedLayout
+        <AuthenticatedLayout
         lang={lang}>
             <select value={lang} onChange={handleChange} className='m-4 mt-20'>
                     {languages.map((item) => {
@@ -218,7 +218,7 @@ export default function CropDiseaseDetection(){
                 </div>
             </div>
                 <Footer lang={lang}/>
-        </UnauthenticatedLayout>
+        </AuthenticatedLayout>
         </>
     )
 }
