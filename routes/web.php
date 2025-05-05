@@ -3,11 +3,11 @@
 use App\Http\Controllers\AiController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\FertRecomController;
 use App\Http\Controllers\NormalUser\FollowerController;
 use App\Http\Controllers\NormalUser\MessagesController;
 use App\Http\Controllers\NormalUser\PlantMonitorController;
 use App\Http\Controllers\OwnerController;
-use App\Http\Controllers\FertRecomController;
 use App\Models\Plant;
 use App\Models\Plant_Image;
 use App\Models\Plant_Monitor;
