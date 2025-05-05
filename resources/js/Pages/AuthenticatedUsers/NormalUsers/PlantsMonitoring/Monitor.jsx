@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Camera } from 'lucide-react';
 import { Head, useForm } from "@inertiajs/react";
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayoututhenticatedLayout";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import Footer from "@/Components/NonPrimitive/Footer";
 
 export default function PlantMonitor() {

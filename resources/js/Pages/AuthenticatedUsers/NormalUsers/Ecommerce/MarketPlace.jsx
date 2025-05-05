@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import { Search } from 'lucide-react';
-
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { useLanguage } from '@/multilanguage';
+import { useTranslation } from 'react-i18next';
 // Main marketplace component
 export default function Marketplace() {
   const [searchQuery, setSearchQuery] = useState('');
+   //multilangiage code
+      const {lang,handleChange,languages} = useLanguage();
+      const {t} = useTranslation();
   
   // Sample business data - replace with API call to your Laravel backend
   const businesses = [
