@@ -8,7 +8,7 @@ use App\Http\Controllers\NormalUser\FollowerController;
 use App\Http\Controllers\NormalUser\MessagesController;
 use App\Http\Controllers\NormalUser\PlantMonitorController;
 use App\Http\Controllers\OwnerController;
-use App\Http\Controllers\MarketplaceController;
+use App\Http\Controllers\NormalUser\MarketplaceController;
 use App\Models\Plant;
 use App\Models\Plant_Image;
 use App\Models\Plant_Monitor;
