@@ -24,5 +24,10 @@ class MarketplaceController extends Controller
         return Inertia::render('AuthenticatedUsers/NormalUsers/Ecommerce/CreditCardInfo');
     }
 
+    function orderSuccess_index(){
+        return Inertia::render('AuthenticatedUsers/NormalUsers/Ecommerce/OrderSuccess');
+    }
+
+
 
 }

@@ -124,6 +124,7 @@ Route::middleware('auth')->controller(MarketplaceController::class)->group(funct
     Route::get('/market/products','viewProducts_index')->name('market.viewProducts_index');
     Route::get('/market/checkout','checkout_index')->name('market.checkout_index');
     Route::get('/market/creditInfo','creditInfo_index')->name('market.creditInfo_index');
+    Route::get('/market/ordersuc','orderSuccess_index')->name('market.orderSuccess_index');
 
 
 
