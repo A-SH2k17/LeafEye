@@ -7,45 +7,26 @@ import { Head } from '@inertiajs/react';
 import Footer from '@/Components/NonPrimitive/Footer';
 import BusinessCard from '@/Components/NonPrimitive/BusinessCard';
 // Main marketplace component
-export default function Marketplace() {
+export default function Marketplace(props) {
   const [searchQuery, setSearchQuery] = useState('');
    //multilangiage code
       const {lang,handleChange,languages} = useLanguage();
       const {t} = useTranslation();
   
   // Sample business data - replace with API call to your Laravel backend
-  const businesses = [
-    {
-      id: 1,
-      name: "GreenGrow Fertilizers",
-      categories: ["Fertilizers", "Seeds"],
-      logo: "/agro-logo.png", // You'll need to replace with actual logo path
-    },
-    {
-      id: 2,
-      name: "Plant Care Shop",
-      categories: ["Soil"],
-      logo: "/agro-logo.png",
-    },
-    {
-      id: 3,
-      name: "Tools4U",
-      categories: ["Planting tools"],
-      logo: "/agro-logo.png",
-    }
-  ];
+  const businesses = props.shops;
 
   // Filter businesses based on search query
   const filteredBusinesses = businesses.filter(business => 
     business.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    business.categories.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()))
+    business.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <>
       <Head title='Market' />
       <AuthenticatedLayout lang={lang}>
-        <div className="flex flex-col min-h-screen bg-gray-50">
+        <div className="flex flex-col min-h-screen">
           
           
           

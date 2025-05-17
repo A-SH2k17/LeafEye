@@ -201,8 +201,14 @@ export default function BusinessDashboard({success,errors,auth,shop,products}) {
                     })}
             </select>
             <div className='p-4'>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">{shop.name} - Inventory Management</h1>
-                <h2 className='text-xl sm:2xl md:3xl font-semibold'>{shop.type}</h2>
+                {shop ? (
+                    <>
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">{shop.name} - Inventory Management</h1>
+                        <h2 className='text-xl sm:2xl md:3xl font-semibold'>{shop.type}</h2>
+                    </>
+                ) : (
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Welcome to Business Dashboard</h1>
+                )}
             </div>
         
             <div className="max-w-7xl mx-auto text-center">

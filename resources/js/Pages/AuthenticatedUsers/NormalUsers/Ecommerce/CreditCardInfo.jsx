@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { CreditCard, Calendar, Lock, ChevronLeft } from 'lucide-react';
+import { CreditCard, Calendar, Lock, ChevronLeft, Router } from 'lucide-react';
 import { useLanguage } from '@/multilanguage';
 import { useTranslation } from 'react-i18next';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Footer from '@/Components/NonPrimitive/Footer';
 
-export default function CreditCardPage() {
+export default function CreditCardPage(props) {
     //multilangiage code
     const {lang,handleChange,languages} = useLanguage();
     const {t} = useTranslation();
@@ -66,32 +66,60 @@ export default function CreditCardPage() {
     setCardInfo({ ...cardInfo, [name]: value });
   };
   
+
+  const isExpiryValid = (expiry) => {
+  const match = expiry.match(/^(0[1-9]|1[0-2])\/(\d{2,4})$/);
+    if (!match) return false;
+
+    const month = parseInt(match[1]);
+    let year = parseInt(match[2]);
+
+    // Normalize to 4-digit year if needed
+    if (year < 100) {
+      year += 2000;
+    }
+
+    const now = new Date();
+    const expiryDate = new Date(year, month); // the *start* of the next month
+
+    return expiryDate > now;
+  };
+
   const handleSubmit = () => {
+    const isAnyFieldEmpty = Object.values(cardInfo).some(value => value.trim() === '');
+    if(isAnyFieldEmpty){
+      alert('Please Fill All the fields');
+    }else if(cardInfo.number.length<16){
+      alert("Please enter 16 digits for the card number")
+    }else if(!isExpiryValid(cardInfo.expiry)){
+      alert("Card is expired")
+    }
+    else{
+      router.post(
+        route('market.confirmOrder'),{
+          cart:props.Cart,
+        }
+      )
+    }
     console.log('Payment submitted:', cardInfo);
-    alert('Payment submitted successfully!');
+    
   };
   
+  const handleCancel = () =>{
+    router.post(
+      route('market.cancelCredit'),
+      {
+        cart: props.Cart,
+      }
+    )
+  }
   return (
     <>
     <Head title='Credit Card Info' />
           <AuthenticatedLayout lang={lang}>
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-green-100 py-3 px-4 border-b border-green-200">
-        <div className="flex justify-between items-center">
-          <div className="text-lg font-medium text-green-800">Green Shop Store</div>
-          <nav className="flex space-x-6">
-            <a href="#" className="text-green-800 text-sm">Shop</a>
-            <a href="#" className="text-green-800 text-sm">Cart</a>
-            <a href="#" className="text-green-800 text-sm">About Us</a>
-            <a href="#" className="text-green-800 text-sm">Chat with Us</a>
-            <a href="#" className="text-green-800 text-sm">#plants23</a>
-          </nav>
-        </div>
-      </header>
-      
+    <div className="flex flex-col min-h-screen">
       {/* Main Content */}
-      <main className="flex-1 flex justify-center p-6 bg-gray-100">
+      <main className="flex-1 flex justify-center pt-20">
         <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
           <div className="flex items-center mb-6">
             <button className="text-green-800 mr-4">
@@ -255,7 +283,8 @@ export default function CreditCardPage() {
             
             <div className="flex space-x-4 pt-4">
               <button
-                className="flex-1 bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded hover:bg-gray-300 transition-colors"
+                className="flex-1 bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded hover:bg-gray-300 transition-colors" 
+                onClick={handleCancel}
               >
                 Cancel
               </button>

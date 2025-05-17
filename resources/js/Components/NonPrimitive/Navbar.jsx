@@ -21,7 +21,7 @@ export default function Navbar({lang,user}){
                     <div className="flex h-16 justify-between">
                         <div className="flex">
                             <div className="flex shrink-0 items-center  p-2">
-                                <Link href={`/?lng=${lang}`}>
+                                <Link href={user?user.role=="normal"?`/home?lng=${lang}`:`/business/dashboard`:`/?lng=${lang}`}>
                                     <ApplicationLogo className="block h-full w-auto fill-current" />
                                 </Link>
                             </div>
@@ -48,7 +48,7 @@ export default function Navbar({lang,user}){
                                             </NavLink>
                                             <NavLink
                                                 className="navText"
-                                                href={route('users_home')}
+                                                href={route('market.viewShops_index')}
                                                 active={route().current('d')}
                                             >
                                                 {t("market")}
@@ -203,7 +203,7 @@ export default function Navbar({lang,user}){
                                         {t("social_media")}
                                 </ResponsiveNavLink>
                                 <ResponsiveNavLink
-                                    href={route('users_home')}
+                                    href={route('market.viewShops_index')}
                                     active={route().current('a')}
                                 >
                                     {t("market")}

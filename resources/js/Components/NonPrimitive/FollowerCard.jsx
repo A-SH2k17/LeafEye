@@ -60,7 +60,7 @@ export default function FollowerCard(props) {
     }, []);
     
     return (
-        <div className={`div3 ${!props.active?"hidden":"block inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"} md:block fixed md:top-[25rem] md:right-0 px-6 md:w-1/2`}>
+        <div className={`div3 ${!props.active?"hidden":"inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"} md:block fixed md:top-[25rem] md:right-0 px-6 md:w-1/2`}>
             <div className={`bg-[#e8fcef] w-full rounded-md shadow-xl flex flex-col p-4 mb-4 ${!limitFollowers?"h-[25em]":""} overflow-y-auto`}>
                 <button onClick={props.toggle} className={`${!props.active?"hidden":"block"}`}>
                         <X className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700" />

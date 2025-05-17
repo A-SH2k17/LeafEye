@@ -8,54 +8,17 @@ import { useTranslation } from 'react-i18next';
 import { Head } from '@inertiajs/react';
 import Footer from '@/Components/NonPrimitive/Footer';
 
-export default function PlantCareShop() {
+export default function PlantCareShop(props) {
     //multilangiage code
     const {lang,handleChange,languages} = useLanguage();
     const {t} = useTranslation();
 
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState(props.Cart || []);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('default');
   const [filteredProducts, setFilteredProducts] = useState([]);
   
-  const products = [
-    {
-      id: 1,
-      name: 'Garden Soil',
-      price: 50,
-      currency: 'EGP',
-      image: '/api/placeholder/150/150',
-      description: "Grow delicious, juicy tomatoes with our high-quality seeds, perfect for home gardens and farms. These seeds are selected for their high yield, disease resistance, and adaptability to various climates. Whether you're a beginner or an expert farmer, enjoy healthy, vibrant tomato plants with a rich flavor. Order now and start your journey to a bountiful harvest! 🍅",
-      category: 'Soil'
-    },
-    {
-      id: 2,
-      name: 'Dirt Bag',
-      price: 50,
-      currency: 'EGP',
-      image: '/api/placeholder/150/150',
-      description: 'Premium soil mix perfect for indoor and outdoor plants. Rich in nutrients and ideal for most garden applications.',
-      category: 'Soil'
-    },
-    {
-      id: 3,
-      name: 'Tomato Seeds',
-      price: 35,
-      currency: 'EGP',
-      image: '/api/placeholder/150/150',
-      description: 'Heirloom tomato seeds that produce juicy, flavorful tomatoes. Easy to grow and perfect for beginners.',
-      category: 'Seeds'
-    },
-    {
-      id: 4,
-      name: 'Organic Fertilizer',
-      price: 75,
-      currency: 'EGP',
-      image: '/api/placeholder/150/150',
-      description: 'All-natural organic fertilizer that promotes healthy growth without harmful chemicals. Suitable for all plants.',
-      category: 'Fertilizer'
-    }
-  ];
+  const products = props.products;
 
   // Filter and sort products whenever search query or sort option changes
   useEffect(() => {
@@ -65,8 +28,7 @@ export default function PlantCareShop() {
     if (searchQuery) {
       result = result.filter(product => 
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
+        product.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     
@@ -98,55 +60,37 @@ export default function PlantCareShop() {
     if (existingItem) {
       setCartItems(cartItems.map(item => 
         item.id === product.id 
-          ? { ...item, quantity: item.quantity + 1 } 
+          ? { ...item, selected_quantity: item.quantity + 1 } 
           : item
       ));
     } else {
-      setCartItems([...cartItems, { ...product, quantity: 1 }]);
+      setCartItems([...cartItems, { ...product, selected_quantity: 1 }]);
     }
   };
 
   const updateQuantity = (productId, newQuantity) => {
     if (newQuantity <= 0) {
       setCartItems(cartItems.filter(item => item.id !== productId));
-    } else {
+    } else{
       setCartItems(cartItems.map(item => 
         item.id === productId 
-          ? { ...item, quantity: newQuantity } 
+          ? newQuantity<=item.quantity?{ ...item, selected_quantity: newQuantity } :item
           : item
       ));
     }
   };
 
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = cartItems.reduce((sum, item) => sum + item.selected_quantity, 0);
 
   return (
     <>
     <Head title='Market Products' />
           <AuthenticatedLayout lang={lang}>
-
-    <div className="min-h-screen bg-green-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center">
-            <span className="text-green-600 font-bold text-xl">LEAF-EYE</span>
-          </div>
-          <nav className="flex space-x-6">
-            <a href="#" className="text-gray-700 hover:text-green-600">Home</a>
-            <a href="#" className="text-gray-700 hover:text-green-600">Feed</a>
-            <a href="#" className="text-gray-700 hover:text-green-600">MarketPlace</a>
-            <a href="#" className="text-gray-700 hover:text-green-600">Chat with LeafEye</a>
-            <a href="#" className="text-gray-700 hover:text-green-600">afshana57</a>
-          </nav>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Plant Care Shop</h1>
-          <p className="text-lg text-gray-600">Seeds and Fertilizers</p>
+        <div className="mb-6 mt-20">
+          <h1 className="text-3xl font-bold text-gray-800">{props.shop.name}</h1>
+          <p className="text-lg text-gray-600">{props.shop.category}</p>
         </div>
 
         {/* Search and Sort Controls */}
@@ -207,7 +151,6 @@ export default function PlantCareShop() {
           </div>
         </div>
       </main>
-    </div>
      <Footer />
     </AuthenticatedLayout>
 

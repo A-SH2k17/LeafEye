@@ -61,10 +61,19 @@ class HandleInertiaRequests extends Middleware
             }
         }
         
-        return [
+        $sharedData = [];
+
+        if ($request->user() && $request->user()->role === 'normal') {
+            $sharedData['Cart'] = session()->get('Cart');
+        }
+
+        if($request->user() && $request->user()->role === 'business'){
+            $sharedData['shop'] = $userShop;
+            $sharedData['products'] =$products;
+        }
+
+        return[
             ...parent::share($request),
-            'shop'=> $userShop,
-            'products'=>$products,
             'auth' => [
                 'user' => $request->user(),
             ],
@@ -73,7 +82,8 @@ class HandleInertiaRequests extends Middleware
                 'throttle:api',
                 \Illuminate\Routing\Middleware\SubstituteBindings::class,
             ],
-            'success'=>session()->get("success"),
+            'success' => session()->get("success"),
+            ...$sharedData,
         ];
     }
 }

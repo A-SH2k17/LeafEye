@@ -121,13 +121,15 @@ Route::middleware('auth')->controller(FertRecomController::class)->group(functio
 // Market place route
 Route::middleware('auth')->controller(MarketplaceController::class)->group(function(){
     Route::get('/market/shops','viewShops_index')->name('market.viewShops_index');
-    Route::get('/market/products','viewProducts_index')->name('market.viewProducts_index');
-    Route::get('/market/checkout','checkout_index')->name('market.checkout_index');
+    Route::get('/market/{name}/products','viewProducts_index')->name('market.viewProducts_index');
     Route::get('/market/creditInfo','creditInfo_index')->name('market.creditInfo_index');
     Route::get('/market/ordersuc','orderSuccess_index')->name('market.orderSuccess_index');
-
-
-
+    Route::post('/market/viewCart','viewCart')->name('market.viewCart');
+    Route::post('/market/return','return')->name('market.return');
+    Route::post('/market/checkout','checkout')->name('market.checkout');
+    Route::post('/market/cancel','cancelCredit')->name('market.cancelCredit');
+    Route::post('/market/confirmOrder','confirmOrder')->name('market.confirmOrder');
+    Route::post('/market/cancelOrder','cancelOrder')->name('market.cancelOrder');
 });
 
 

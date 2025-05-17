@@ -2,24 +2,41 @@ import { useState } from 'react';
 import { ChevronLeft, CheckCircle, CreditCard, Calendar, Lock } from 'lucide-react';
 import { useLanguage } from '@/multilanguage';
 import { useTranslation } from 'react-i18next';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Footer from '@/Components/NonPrimitive/Footer';
 
 
 
-
 // Success page component
-export default function SuccessPage({ onCreditPage, onReturnToStore }) {
+export default function SuccessPage(props) {
     //multilangiage code
     const { lang, handleChange, languages } = useLanguage();
     const { t } = useTranslation();
-    
+    const onReturnToStore = () =>{
+      router.post(
+        route('market.return'),{
+          shopId : props.Cart[0].shop_id,
+        }
+      )
+    }
+
+    const onCancelOrder = () => {
+      if (window.confirm('Are you sure you want to cancel this order?')) {
+        router.post(
+          route('market.cancelOrder'),
+          {
+            cart: props.Cart,
+          }
+        )
+      }
+    }
+
     return (
       <>
         <Head title='Order Success' />
         <AuthenticatedLayout lang={lang}>
-          <div className="flex justify-center items-center min-h-screen bg-gray-100 py-12 px-4">
+          <div className="flex justify-center items-center min-h-screen py-12 px-4">
             <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full text-center">
               <div className="flex justify-center mb-4">
                 <div className="bg-green-50 rounded-full p-4">
@@ -32,14 +49,14 @@ export default function SuccessPage({ onCreditPage, onReturnToStore }) {
               
               <div className="space-y-3">
                 <button
-                  onClick={onReturnToStore}
+                  onClick={()=>onReturnToStore()}
                   className="w-full bg-green-100 text-green-800 font-medium py-2 px-4 rounded hover:bg-green-200 transition-colors"
                 >
                   Return To Store
                 </button>
                 
                 <button
-                  onClick={onCreditPage}
+                  onClick={()=>onCancelOrder()}
                   className="w-full bg-red-500 text-white font-medium py-2 px-4 rounded hover:bg-red-600 transition-colors"
                 >
                   Cancel Order

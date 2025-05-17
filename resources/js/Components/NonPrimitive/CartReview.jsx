@@ -1,7 +1,15 @@
+import { router } from '@inertiajs/react';
 import { ShoppingCart } from 'lucide-react';
 export default function CartReview({ items, updateQuantity, totalItems }) {
-    const cartTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
+    const cartTotal = items.reduce((sum, item) => sum + (item.price * item.selected_quantity), 0).toFixed(2);
+
+    const handleView = () =>{
+      router.post(
+        route('market.viewCart'),{
+          chosenItems: items,
+        }
+      )
+    }
     return (
       <div className="bg-white rounded-lg shadow-md p-4 sticky top-4">
         <h2 className="text-xl font-bold mb-4">Cart Review</h2>
@@ -23,17 +31,28 @@ export default function CartReview({ items, updateQuantity, totalItems }) {
                     <span className="mr-2">Qty:</span>
                     <div className="flex items-center border rounded">
                       <button 
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.id, item.selected_quantity - 1)}
                         className="px-2 py-1 bg-gray-100 hover:bg-gray-200"
                       >
                         -
                       </button>
-                      <span className="px-3">{item.quantity}</span>
+                      <span className="px-3">{item.selected_quantity}</span>
                       <button 
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, item.selected_quantity + 1)}
                         className="px-2 py-1 bg-gray-100 hover:bg-gray-200"
                       >
                         +
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center mt-3">
+                    <div className="flex items-center border rounded ">
+                      <button 
+                        onClick={() => updateQuantity(item.id, item.selected_quantity - item.selected_quantity)}
+                        className="px-2 py-1 bg-red-500 hover:bg-red-400 text-white"
+                      >
+                        Remove
                       </button>
                     </div>
                   </div>
@@ -49,7 +68,7 @@ export default function CartReview({ items, updateQuantity, totalItems }) {
             </div>
             
             <div className="mt-4">
-              <button className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-medium flex items-center justify-center">
+              <button className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded font-medium flex items-center justify-center" onClick={()=>handleView()}>
                 <ShoppingCart size={18} className="mr-2" />
                 View Cart
               </button>
