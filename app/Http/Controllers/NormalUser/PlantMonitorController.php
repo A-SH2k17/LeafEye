@@ -7,9 +7,11 @@ use App\Models\Plant;
 use App\Models\Plant_Image;
 use App\Models\Plant_Monitor;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Queue\Monitor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -29,8 +31,17 @@ class PlantMonitorController extends Controller
     }
     
     // function to show the monitored plant
-    function showImage_index(){
-        return Inertia::render('AuthenticatedUsers/NormalUsers/PlantsMonitoring/Monitor');
+    function showImage_index($monitor){
+        $images = Plant_Image::where("monitor_id",$monitor->id)->get()->map(function($m){
+            return [
+                "image_path"=>$m->image_path,
+                "datePlanted"=>Carbon::parse($m->created_at)->format('F j, Y'),
+            ];
+        });
+        $plantType = Plant::where("id",$monitor->plant_id)->first()->plant_type;
+        $plantDate = Carbon::parse($monitor->created_at)->format('F j, Y');
+        $exactDate = Carbon::parse($monitor->created_at)->format('F j, Y H:i:s');
+        return Inertia::render('AuthenticatedUsers/NormalUsers/PlantsMonitoring/Monitor',['images'=>$images,"type"=>$plantType,"plantDate"=>$plantDate,"exactDate"=>$exactDate]);
 
     }
 
@@ -115,11 +126,27 @@ class PlantMonitorController extends Controller
                 "image_path" => $imagePath
             ]);
 
-            return back()->with("success","Plant Added Succesfully");
+            return redirect()->route('users_home')->with("success","Plant Added Succesfully");
         } catch (\Exception $e) {
             return back()->with("error",$e->getMessage());
         }
     }
 
 
+    //function to call the renderer
+    function showImagePost(Request $request){
+        $extracteddate = Carbon::createFromFormat('F j, Y H:i:s', $request->date_planted);
+        $monitor = Plant_Monitor::where('created_at',$extracteddate)->first();
+        return $this->showImage_index($monitor);
+    }
+
+    //function to call the add PlantRenderer
+    function imageAddPost(Request $request){
+        $extracteddate = Carbon::createFromFormat('F j, Y H:i:s', $request->exactDate);
+        $monitor = Plant_Monitor::where('created_at',$extracteddate)->first();
+        //return $monitor;
+        $plantTyp = Plant::find($monitor->id)->plant_type;
+        //return $plantTyp;
+        return redirect()->route('montor.add_plant_image',['plant'=>$plantTyp,'monitor_id'=>$monitor->id,'user'=>Auth::user()->username]);
+    }
 }

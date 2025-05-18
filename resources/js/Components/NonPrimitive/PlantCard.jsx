@@ -1,9 +1,19 @@
+import { router } from "@inertiajs/react";
 import react from "react";
 import { useTranslation } from 'react-i18next';
 
 export default function PlantCard({plant}){
     const {t} = useTranslation();
 
+    const monitorPlant = () =>{
+        router.post(
+            route('monitor.monitor_post'),
+            {
+                plant_type:plant.type,
+                date_planted: plant.exact_time
+            }
+        )
+    }
     return (
         <div className="sm:w-[25vh] md:w-[50vh]  bg-[#A6C5A7] m-5 rounded-2xl p-4 shadow-lg">
             <div className="bg-gray-200 rounded-lg overflow-hidden mb-4 flex">
@@ -22,7 +32,7 @@ export default function PlantCard({plant}){
             </div>
             <div className="p-2">
                 
-                <button className="w-full bg-leaf-button-main text-white py-2 px-4 rounded hover:bg-green-800 transition-colors">
+                <button className="w-full bg-leaf-button-main text-white py-2 px-4 rounded hover:bg-green-800 transition-colors" onClick={()=>monitorPlant()}>
                 {t("monitor")}
                 </button>
             </div>
