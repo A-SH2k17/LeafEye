@@ -17,6 +17,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 Route::post('/test',function(){
     return 'yes';
@@ -135,7 +136,22 @@ Route::middleware('auth')->controller(MarketplaceController::class)->group(funct
     Route::post('/market/cancelOrder','cancelOrder')->name('market.cancelOrder');
 });
 
+// Messaging routes
+Route::middleware('auth')->group(function () {
+    Route::get('/messages', function () {
+        return Inertia::render('AuthenticatedUsers/NormalUsers/Messaging/MessagePage');
+    })->name('messages.index');
+    
+    Route::get('/chatbot', function () {
+        return Inertia::render('AuthenticatedUsers/NormalUsers/Chatbot/ChatbotPage');
+    })->name('chatbot.index');
+});
 
-
+// Messaging API routes
+Route::middleware('auth')->group(function () {
+    Route::get('/api/users', [MessagesController::class, 'getUsers']);
+    Route::get('/api/messages/{receiver_id}', [MessagesController::class, 'getConversation']);
+    Route::post('/api/messages', [MessagesController::class, 'store']);
+});
 
 require __DIR__.'/auth.php';

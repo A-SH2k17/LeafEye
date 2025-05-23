@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Fertilizer_Recommendation;
+use App\Models\Plant;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
 
 class FertRecomController extends Controller
 {
@@ -25,6 +30,8 @@ class FertRecomController extends Controller
             "crop" => "required|string"
         ]);
         try{
+            DB::beginTransaction();
+
             $response = Http::post(config('services.flask_api.url') . '/fertilizer', [
                 'input' => [
                     $request->soil_color,
@@ -37,6 +44,37 @@ class FertRecomController extends Controller
                     (int)$request->temperature
                 ]
             ]);
+
+            if (!$response->successful()) {
+                throw new Exception('API returned error status: ' . $response->status());
+            }
+
+            $responseData = $response->json();
+            
+            // Extract fertilizer and description from the response
+            $fertilizer = $responseData['fertilizer'] ?? null;
+            $description = $responseData['description'] ?? null;
+
+            if (!$fertilizer || !$description) {
+                throw new Exception('Invalid response format: missing fertilizer or description');
+            }
+
+            $plant = Plant::where('name', $request->crop)->first();
+            if($plant==NULL){
+                $plant = Plant::create(['plant_type'=>$request->crop]);
+            }
+
+            $fertilizer_history = Fertilizer_Recommendation::create([
+                'requested_by' => Auth::id(),
+                'recommendation_content' => json_encode([
+                    'fertilizer' => $fertilizer,
+                    'description' => $description
+                ]),
+                'date_requested' => Date::now(),
+                'plant_id'=>$plant->id,
+            ]);
+
+            DB::commit();
             
             if($response->successful()){
                 return $response;
@@ -48,6 +86,7 @@ class FertRecomController extends Controller
                 'message' => 'API returned error status: ' . $response->status()
             ], $response->status());
         }catch(Exception $e){
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to connect to the Fert REcommend API: ' . $e->getMessage()

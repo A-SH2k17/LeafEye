@@ -11,7 +11,8 @@ class Chatbot_Interaction extends Model
     /** @use HasFactory<\Database\Factories\ChatbotInteractionFactory> */
     use HasFactory, HasApiTokens;
 
-    protected $fillable=[
+    protected $fillable = [
+        'title',
         'content',
         'user_id',
         'date_interacted'
