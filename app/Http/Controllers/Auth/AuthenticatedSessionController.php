@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -66,6 +67,7 @@ class AuthenticatedSessionController extends Controller
             
 
             if($user == null || !Hash::check($request->password, $user->password)){
+                Log::info("here");
                 return response()->json([
                     'error'=>"Invalid Credentials",
                 ],500);

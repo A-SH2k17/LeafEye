@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
@@ -98,6 +99,8 @@ class RegisteredUserController extends Controller
             ]);
         
             if ($validator->fails()) {
+                Log::info($validator->errors());
+                Log::info($request->customerType);
                 return response()->json([
                     'message' => 'Validation failed',
                     'errors' => $validator->errors()
@@ -138,7 +141,7 @@ class RegisteredUserController extends Controller
                 'token' => $token,
                 'shop' => $shop,
                 'message' => 'User registered successfully'
-            ], 201);
+            ], 200);
         }catch(Exception $e){
             DB::rollBack();
             return response()->json([

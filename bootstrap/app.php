@@ -18,7 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
             PreventBack::class,
         ]);
 
-        //
+        $middleware->alias([
+        'cors' => \Illuminate\Http\Middleware\HandleCors::class,
+    ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

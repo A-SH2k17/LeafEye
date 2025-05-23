@@ -13,6 +13,7 @@ use Illuminate\Contracts\Queue\Monitor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -148,5 +149,61 @@ class PlantMonitorController extends Controller
         $plantTyp = Plant::find($monitor->id)->plant_type;
         //return $plantTyp;
         return redirect()->route('montor.add_plant_image',['plant'=>$plantTyp,'monitor_id'=>$monitor->id,'user'=>Auth::user()->username]);
+    }
+
+
+    //give the last 5 plants to the user in the mobile
+    function getRecentPlantsApi(){
+        $user = Auth::user();
+        $plant_monitors = Plant_Monitor::where('planted_by',$user->id)->latest()->limit(5)->get();
+        $plants = [];
+        foreach($plant_monitors as $monitor){
+            $image = Plant_Image::where('monitor_id',$monitor->id)->latest()->first()->image_path;
+            array_push($plants,[
+                "plantType"=>Plant::find($monitor->plant_id)->plant_type,
+                "image"=>"https://leafeye.eu-1.sharedwithexpose.com/" . $image,
+                "datePlanted" => Carbon::parse($monitor->date_planted)->format('F j, Y'),
+                'exact_time'=>  Carbon::parse($monitor->date_planted)->format('F j, Y H:i:s'),
+                'monitor_id'=>$monitor->id,
+            ]);
+        }
+        return response()->json(
+            ["message"=>$plants]
+        );
+    }
+
+    function getAllPlantsApi(){
+        $user = Auth::user();
+        $plant_monitors = Plant_Monitor::where('planted_by',$user->id)->latest()->get();
+        $plants = [];
+        foreach($plant_monitors as $monitor){
+            $image = Plant_Image::where('monitor_id',$monitor->id)->latest()->first()->image_path;
+            array_push($plants,[
+                "plantType"=>Plant::find($monitor->plant_id)->plant_type,
+                "image"=>"https://leafeye.eu-1.sharedwithexpose.com/" . $image,
+                "datePlanted" => Carbon::parse($monitor->date_planted)->format('F j, Y'),
+                'exact_time'=>  Carbon::parse($monitor->date_planted)->format('F j, Y H:i:s'),
+                'monitor_id'=>$monitor->id,
+            ]);
+        }
+        return response()->json(
+            ["message"=>$plants]
+        );
+    }
+
+    function getPlantImagesApi(Request $request){
+        $user = Auth::user();
+        $plant_images = Plant_Image::where('monitor_id',$request->monitor_id)->get();
+        $plants = [];
+        foreach($plant_images as $image){
+            array_push($plants,[
+                "image"=>"https://leafeye.eu-1.sharedwithexpose.com/" . $image->image_path,
+                "datePlanted" => Carbon::parse($image->created_at)->format('F j, Y'),
+                "id"=>$image->id,
+            ]);
+        }
+        return response()->json(
+            ["message"=>$plants]
+        );
     }
 }
