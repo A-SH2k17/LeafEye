@@ -64,8 +64,8 @@ export default function Navbar({lang,user}){
                                 <div >
                                     <NavLink
                                             className="navText"
-                                            href={route('users_home')}
-                                            active={route().current('d')}
+                                            href={route('chatbot.index')}
+                                            active={route().current('chatbot.index')}
                                         >
                                             {t("chatbot")}
                                     </NavLink>
@@ -207,6 +207,11 @@ export default function Navbar({lang,user}){
                                     active={route().current('a')}
                                 >
                                     {t("market")}
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('chatbot.index',user.username)}
+                                    active={route().current('chatbot.index')}>
+                                        {t("chatbot")}
                                 </ResponsiveNavLink>
                             </>
                         }

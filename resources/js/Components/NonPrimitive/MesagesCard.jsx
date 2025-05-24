@@ -1,10 +1,13 @@
 import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { router } from "@inertiajs/react";
+import { useTranslation } from "react-i18next";
 
 export default function MessagesCard(props) {
     const [messages, setMessages] = useState([]);
     const [i, setI] = useState(0);
+
+    const {t} =useTranslation();
 
     const getMessages = () => {
         try {
@@ -41,8 +44,8 @@ export default function MessagesCard(props) {
         return () => clearInterval(interval);
     }, []);
 
-    const handleViewMessage = (sender) => {
-        router.visit(route('messages.index', { user: sender }));
+    const handleViewMessage = () => {
+        router.visit(route('messages.index'));
     };
 
     return (
@@ -51,7 +54,7 @@ export default function MessagesCard(props) {
                 <button onClick={props.toggle} className={`${!props.active ? "hidden" : "block"}`}>
                     <X className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700" />
                 </button>
-                <p className="font-bold text-center mb-4">Received Messages</p>
+                <p className="font-bold text-center mb-4">{t('received')}</p>
                 {messages.length === 0 && (
                     <p className="py-14">{i === 0 ? "Loading messages..." : "There are no messages..."}</p>
                 )}
@@ -63,10 +66,10 @@ export default function MessagesCard(props) {
                             <p className="text-sm text-gray-600 truncate">{message.content}</p>
                         </div>
                         <button 
-                            onClick={() => handleViewMessage(message.sender)}
+                            onClick={() => handleViewMessage()}
                             className="text-sm text-green-700 hover:text-green-900"
                         >
-                            View Message
+                            {t('messages_link')}
                         </button>
                     </div>
                 ))}

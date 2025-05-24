@@ -136,7 +136,7 @@ Route::middleware('auth')->controller(MarketplaceController::class)->group(funct
     Route::post('/market/cancelOrder','cancelOrder')->name('market.cancelOrder');
 });
 
-// Messaging routes
+// Messaging and chatbot routes
 Route::middleware('auth')->group(function () {
     Route::get('/messages', function () {
         return Inertia::render('AuthenticatedUsers/NormalUsers/Messaging/MessagePage');
@@ -145,6 +145,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/chatbot', function () {
         return Inertia::render('AuthenticatedUsers/NormalUsers/Chatbot/ChatbotPage');
     })->name('chatbot.index');
+
+    Route::post('/chat/stream',[AiController::class,'ChatbotStream']);
+    Route::get('/chat/history', [AiController::class, 'getChatHistory']);
+    Route::post('/chat/new', [AiController::class, 'createNewChat']);
+    Route::post('/chat/update/{chatId}', [AiController::class, 'updateChat']);
 });
 
 // Messaging API routes

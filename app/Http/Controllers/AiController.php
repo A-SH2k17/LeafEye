@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Disease_Detection;
 use App\Models\Plant;
+use App\Models\Chatbot_Interaction;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use PhpParser\Node\Expr\AssignOp\Plus;
+use Symfony\Component\HttpFoundation\StreamedResponse; // Add this import
 
 class AiController extends Controller
 {
@@ -106,4 +109,66 @@ class AiController extends Controller
         }
     }
 
+    public function ChatbotStream(Request $request){
+        return new StreamedResponse(function() use ($request) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, config('services.flask_api.url') . '/chat/simple');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request->all()));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch, $data) {
+                echo $data;
+                if (ob_get_level()) {
+                    ob_flush();
+                }
+                flush();
+                return strlen($data);
+            });
+            
+            curl_exec($ch);
+            curl_close($ch);
+        }, 200, [
+            'Content-Type' => 'text/plain',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no', // Disable nginx buffering if using nginx
+        ]);
+    }
+
+    public function getChatHistory()
+    {
+        $chats = Chatbot_Interaction::where('user_id', Auth::id())
+            ->orderBy('date_interacted', 'desc')
+            ->get();
+        
+        return response()->json($chats);
+    }
+
+    public function createNewChat(Request $request)
+    {
+        $chat = Chatbot_Interaction::create([
+            'user_id' => Auth::id(),
+            'title' => $request->firstMessage,
+            'content' => json_encode([[
+                'role' => 'user',
+                'content' => $request->firstMessage,
+                'timestamp' => now()->format('h:i A')
+            ]]),
+            'date_interacted' => now()
+        ]);
+
+        return response()->json($chat);
+    }
+
+    public function updateChat(Request $request, $chatId)
+    {
+        $chat = Chatbot_Interaction::where('user_id', Auth::id())
+            ->where('id', $chatId)
+            ->firstOrFail();
+
+        $chat->content = json_encode($request->messages);
+        $chat->save();
+
+        return response()->json(['success' => true]);
+    }
 }

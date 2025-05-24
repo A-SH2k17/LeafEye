@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function FollowerCard(props) {
     const [limitFollowers, setLimitFollowers] = useState(false);
-    
+    const {t} = useTranslation()
 
     const [followers,setFollowers]  = useState([]);
         const [i,setI] = useState(0);
@@ -65,7 +66,7 @@ export default function FollowerCard(props) {
                 <button onClick={props.toggle} className={`${!props.active?"hidden":"block"}`}>
                         <X className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700" />
                 </button> 
-                <p className="font-bold text-center mb-4">Followers</p>
+                <p className="font-bold text-center mb-4">{t('followers')}</p>
                 {followers.length==0 &&
                 <p>{i==0?"Loading Followers...":"There are no followers..."}</p>}
                 {
