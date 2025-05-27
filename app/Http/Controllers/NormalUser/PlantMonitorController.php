@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\NormalUser;
 
 use App\Http\Controllers\Controller;
+use App\Models\Disease_Detection;
 use App\Models\Plant;
 use App\Models\Plant_Image;
 use App\Models\Plant_Monitor;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class PlantMonitorController extends Controller
@@ -34,15 +36,28 @@ class PlantMonitorController extends Controller
     // function to show the monitored plant
     function showImage_index($monitor){
         $images = Plant_Image::where("monitor_id",$monitor->id)->get()->map(function($m){
+            $disease = Disease_Detection::find($m->disease_detection_id);
+            $disease_name = null;
+            if($disease){
+                $disease_name = $disease->disease_name;
+            }
             return [
                 "image_path"=>$m->image_path,
                 "datePlanted"=>Carbon::parse($m->created_at)->format('F j, Y'),
+                "diagnosis"=>$disease_name
             ];
         });
         $plantType = Plant::where("id",$monitor->plant_id)->first()->plant_type;
         $plantDate = Carbon::parse($monitor->created_at)->format('F j, Y');
         $exactDate = Carbon::parse($monitor->created_at)->format('F j, Y H:i:s');
-        return Inertia::render('AuthenticatedUsers/NormalUsers/PlantsMonitoring/Monitor',['images'=>$images,"type"=>$plantType,"plantDate"=>$plantDate,"exactDate"=>$exactDate]);
+        $p_mon = Plant_Monitor::where('id',$monitor->id)->first();
+        $collection = null;
+        if($p_mon){
+            Log::info("in");
+            $collection = $p_mon->collection_name;
+        }
+        
+        return Inertia::render('AuthenticatedUsers/NormalUsers/PlantsMonitoring/Monitor',['images'=>$images,"type"=>$plantType,"plantDate"=>$plantDate,"exactDate"=>$exactDate,"collection"=>$collection]);
 
     }
 
@@ -52,10 +67,20 @@ class PlantMonitorController extends Controller
         DB::beginTransaction(); // Ensure data integrity
 
         try {
+            Log::info('Request data:', $request->all());
+            Log::info('Collection Name:', ['value' => $request->collectionName]);
+
             $validator = Validator::make($request->all(), [
                 'plantType' => 'required|string|max:255',
                 'image' => 'required|image|max:2048',
-                'username' => 'required|exists:users,username'
+                'username' => 'required|exists:users,username',
+                'collectionName' => [
+                    'required',
+                    'string',
+                    Rule::unique('plant__monitors')->where(function ($query) use ($request) {
+                        return $query->where('collection_name', $request->collectionName);
+                    }),
+                ],
             ]);
 
             if ($validator->fails()) {
@@ -82,12 +107,13 @@ class PlantMonitorController extends Controller
           
             $monitor = ($latestMonitor && $latestMonitor->date_planted < now()) ? null : $latestMonitor;
 
-            
+            //return $request->collectionName;
             if (!$monitor) {
                 $monitor = Plant_Monitor::create([
                     "date_planted" => now(),
                     "planted_by" => $user_id,
-                    "plant_id" => $plantType->id
+                    "plant_id" => $plantType->id,
+                    "collection_name" => $request->collectionName,
                 ]);
             }
 
@@ -196,14 +222,24 @@ class PlantMonitorController extends Controller
         $plant_images = Plant_Image::where('monitor_id',$request->monitor_id)->get();
         $plants = [];
         foreach($plant_images as $image){
+            $disease = Disease_Detection::find($image->disease_detection_id);
+            $disease_name = null;
+            if($disease){
+                $disease_name = $disease->disease_name;
+            }
             array_push($plants,[
                 "image"=>"https://leafeye.eu-1.sharedwithexpose.com/" . $image->image_path,
                 "datePlanted" => Carbon::parse($image->created_at)->format('F j, Y'),
                 "id"=>$image->id,
+                "disease"=>$disease_name,
             ]);
         }
         return response()->json(
             ["message"=>$plants]
         );
+    }
+
+    function getCollectionNames(Request $request){
+        
     }
 }

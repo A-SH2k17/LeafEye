@@ -49,7 +49,8 @@ Route::get('/home', function () {
             "datePlanted" => Carbon::parse($monitor->date_planted)->format('F j, Y'),
             'exact_time'=>  Carbon::parse($monitor->date_planted)->format('F j, Y H:i:s'),
             "image_path" => $monitor->images->first()->image_path ?? null,
-            "id" => $monitor->id
+            "id" => $monitor->id,
+            "collectionName" => $monitor->collection_name,
         ];
     })
     ->toArray();
@@ -95,6 +96,7 @@ Route::middleware('auth')->controller(PlantMonitorController::class)->group(func
     Route::get('/plant/image','showImage_index')->name('monitor.monitor_plant');
     Route::post('/plant/image','showImagePost')->name('monitor.monitor_post');
     Route::post('plantMonitor/addImage','imageAddPost')->name('monitor.add_plant_imagePost');
+    Route::get('/getCollectionNames','getCollectionNames')->name('monitor.get_collection_names');
 });
 
 

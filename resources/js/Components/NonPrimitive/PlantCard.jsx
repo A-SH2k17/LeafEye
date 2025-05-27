@@ -20,14 +20,18 @@ export default function PlantCard({plant}){
                 <img 
                 src={`/storage/${plant.image_path}`} 
                 alt={plant.type} 
-                className="h-[150px] w-1/2 object-cover"
+                className="h-[200px] w-1/2 object-cover"
                 />
                 <div className="p-4">
                     <p className="font-medium">{t("plant_type")}</p>
                     <p className="text-gray-600 mb-2">{plant.type}</p>
                     
                     <p className="font-medium">{t("date_plant")}</p>
-                    <p className="text-gray-600 mb-4">{plant.datePlanted}</p>
+                    <p className="text-gray-600 mb-2">{plant.datePlanted}</p>
+
+                    <p className="font-medium">{t("collection")}</p>
+                    <p>{plant.collectionName?plant.collectionName:"unkown"}</p>
+                   
                 </div>
             </div>
             <div className="p-2">

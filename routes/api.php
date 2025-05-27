@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AiController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use Illuminate\Http\Request;
@@ -34,6 +35,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/fertilizer_recommendation',[App\Http\Controllers\FertRecomController::class,'recommend']);
     Route::post('/disease_detection',[App\Http\Controllers\AiController::class,'detectDisease']);
 
+    Route::get('/chat/history', [AiController::class, 'getChatHistory']);
+    Route::post('/chat/new', [AiController::class, 'createNewChat']);
+    Route::post('/chat/update/{chatId}', [AiController::class, 'updateChat']);
+    Route::post('/chat/generate', [AiController::class, 'generateChat']);
 });
 //registration api
 Route::controller(RegisteredUserController::class)->group(function(){
@@ -44,6 +49,7 @@ Route::controller(RegisteredUserController::class)->group(function(){
 Route::controller(AuthenticatedSessionController::class)->group(function(){
     Route::post('login','storeapi');
 });
+
 
 Route::middleware(['cors'])->group(function () {
     Route::get('/test2', function () {

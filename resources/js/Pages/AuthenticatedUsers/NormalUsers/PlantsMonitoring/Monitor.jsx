@@ -33,7 +33,7 @@ export default function PlantMonitor(props) {
           <main className="container mx-auto px-4 py-6 pt-32">
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="mb-6">
-                <h1 className="text-2xl font-bold text-green-800">{props.type}</h1>
+                <h1 className="text-2xl font-bold text-green-800">{props.type} - {props.collection}</h1>
                 <div className="flex justify-between items-center mt-2">
                   <p className="text-gray-600">Date Planted: {props.plantDate}</p>
                   <button
@@ -60,6 +60,7 @@ export default function PlantMonitor(props) {
                         className="w- h-48 object-cover rounded"
                       />
                       <p className="text-center mt-2 text-gray-700">{image.datePlanted}</p>
+                      <p className="text-center mt-2 text-gray-700">Health Staus: {image.diagnosis?image.diagnosis:"not diagnosed"}</p>
                     </div>
                   ))}
                 </div>

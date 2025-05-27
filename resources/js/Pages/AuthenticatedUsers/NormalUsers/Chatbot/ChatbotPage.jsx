@@ -87,6 +87,8 @@ export default function ChatbotPage() {
 
     const handleSendMessage = async (e) => {
         if (e) e.preventDefault();
+
+        let newC = null;
         
         if (!message.trim()) return;
         
@@ -108,6 +110,7 @@ export default function ChatbotPage() {
                     body: JSON.stringify({ firstMessage: message }),
                 });
                 const newChat = await response.json();
+                newC = newChat;
                 setSelectedChat(newChat);
                 setChatHistory(prev => [newChat, ...prev]);
             } catch (error) {
@@ -179,10 +182,11 @@ export default function ChatbotPage() {
             }];
             
             setMessages(updatedMessages);
-
+           
             // Update chat in database
-            if (selectedChat) {
-                await fetch(`/chat/update/${selectedChat.id}`, {
+            if (selectedChat || newC) {
+                console.log(updatedMessages);
+                await fetch(`/chat/update/${selectedChat?.id || newC.id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -18,6 +18,11 @@ class Chatbot_Interaction extends Model
         'date_interacted'
     ];
 
+    protected $casts = [
+        'content' => 'array',
+        'date_interacted' => 'datetime'
+    ];
+
     public function user(){
        return $this->belongsTo(User::class);
     }

@@ -14,7 +14,8 @@ class Plant_Image extends Model
     protected $fillable = [
         'image_path',
         'date_taken',
-        'monitor_id'
+        'monitor_id',
+        'disease_detection_id'
     ];
 
     public function plant(){

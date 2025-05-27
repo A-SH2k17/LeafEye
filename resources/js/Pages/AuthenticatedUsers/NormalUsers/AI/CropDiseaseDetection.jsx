@@ -2,13 +2,14 @@ import Footer from "@/Components/NonPrimitive/Footer";
 import AuthenticatedLayout from "@/Layouts/UnauthenticatedLayout";
 import { Head,useForm} from "@inertiajs/react";
 import React from "react";
-import { useEffect,useState } from "react";
+import { useEffect,useState,useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/multilanguage";
 import axios from "axios";
 
 export default function CropDiseaseDetection(){
 
+    const saveMounted = useRef(false);
 
     //multilanguage code
     const {lang,handleChange,languages} = useLanguage();
@@ -20,6 +21,7 @@ export default function CropDiseaseDetection(){
     const [previewImage, setPreviewImage] = useState(null);
     const [detectionResult, setDetectionResult] = useState(null);
     const [error, setError] = useState(null);
+    const [save,setSave] = useState(false);
     
     const { data, setData, reset, errors } = useForm({
         image: null,
@@ -58,6 +60,12 @@ export default function CropDiseaseDetection(){
         formData.append('image', data.image);
         
         try {
+            const saveInput = confirm("Do you want to save the image?")
+            if(saveInput){
+                setSave(true)
+            }else{
+                setSave(false)
+            }
             const response = await axios.post('/crop-disease/detect', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -86,6 +94,24 @@ export default function CropDiseaseDetection(){
         }
     };
 
+    //collection code
+    const collectionNames = [
+        {
+            "id":1,
+            "name":"test",
+        }
+    ]
+
+    const [selectName,setSelectedName] = useState("");
+    const [newColl,setNewColl]=useState(true);
+    useEffect(()=>{
+        if(saveMounted.current){
+            //alert(save)
+        }else{
+            saveMounted.current = true;
+        }
+        
+    },[save]);
     return(
         <>
         <Head title="AI Crop Disease Diagnostic"  />
@@ -103,7 +129,7 @@ export default function CropDiseaseDetection(){
                         );
                     })}
                 </select>
-                <button onClick={()=>(alert(detectionResult))}>Test</button>
+                <button onClick={()=>(alert(save))}>Test</button>
                 <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className=" overflow-hidden shadow-2xl sm:rounded-lg">
@@ -169,7 +195,7 @@ export default function CropDiseaseDetection(){
                                         <div className="bg-white p-6 rounded-lg shadow">
                                             <h3 className="text-xl font-bold mb-3">Detection Results</h3>
                                             
-
+                                            
                                             <div className="mb-4">
                                                 <h4 className="font-medium mb-1">Plant Type:</h4>
                                                 <p className="text-lg">{detectionResult.plantType || 'Unknown'}</p>
@@ -207,9 +233,33 @@ export default function CropDiseaseDetection(){
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
-                                            <p className="text-gray-500">Disease detection results will appear here</p>
+                                        <>
+                                        <div>
+                                            <p>Existing Collection</p>
+                                            <input type="radio" name="existing" id=""  onChange={()=>setNewColl(false)}/> <label className="mr-3">Yes</label>
+                                            <input type="radio" name="existing" id="" onChange={()=>setNewColl(true)}/> <label htmlFor="">No</label>
                                         </div>
+                                        { newColl &&
+                                            <div>
+                                                <label className="mr-2">Collection Name</label>
+                                                <input type="text" onChange={(e)=>alert()}/>
+                                                <button type="submit">Save</button>
+                                            </div>
+                                        }
+                                        {
+                                            !newColl &&
+                                            <div className="mb-4">
+                                                    <h4 className="font-medium mb-1">Collection:</h4>
+                                                    <select name="collections" id="" onChange={(e)=>setSelectedName(e.target.value)}>{collectionNames.map((name)=>
+                                                        (<option id={name.id} value={name.name}>{name.name}</option>)
+                                                    )}</select>
+                                                    <button type="submit">Save</button>
+                                            </div>
+                                        }
+                                            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
+                                                <p className="text-gray-500">Disease detection results will appear here</p>
+                                            </div>
+                                        </>
                                     )}
                                 </div>
                             </div>

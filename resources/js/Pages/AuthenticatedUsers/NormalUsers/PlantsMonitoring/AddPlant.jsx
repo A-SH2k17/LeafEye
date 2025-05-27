@@ -18,6 +18,7 @@ export default function AddPlant(props) {
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [plantType, setPlantType] = useState("");
+    const [collectionName, setCollectionName] = useState("");
     const fileInputRef = useRef(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,6 +57,11 @@ export default function AddPlant(props) {
             return;
         }
 
+        if (!collectionName.trim()) {
+            alert("Please enter collection name");
+            return;
+        }
+
         setIsSubmitting(true);
 
         // Create FormData object to send to server
@@ -63,6 +69,7 @@ export default function AddPlant(props) {
         formData.append('username', props.auth.user.username);
         formData.append("image", selectedImage);
         formData.append("plantType", plantType);
+        formData.append("collectionName",collectionName)
 
         // Send to server using Inertia
         router.post('/plant/add', formData, {
@@ -157,6 +164,23 @@ export default function AddPlant(props) {
                                 name="plantType"
                                 value={plantType}
                                 onChange={(e) => setPlantType(e.target.value)}
+                                placeholder="Enter plant type"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                disabled={isSubmitting}
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-6">
+                            <label htmlFor="plantType" className="block text-gray-700 font-medium mb-2">
+                               Collection Name
+                            </label>
+                            <input
+                                type="text"
+                                id="collectionName"
+                                name="collectionName"
+                                value={collectionName}
+                                onChange={(e) => setCollectionName(e.target.value)}
                                 placeholder="Enter plant type"
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                                 disabled={isSubmitting}

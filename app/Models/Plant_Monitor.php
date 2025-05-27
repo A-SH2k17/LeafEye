@@ -14,7 +14,8 @@ class Plant_Monitor extends Model
     protected $fillable=[
         'date_planted',
         'planted_by',
-        'plant_id'
+        'plant_id',
+        'collection_name'
     ];
 
     public function users(){
