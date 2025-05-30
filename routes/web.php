@@ -97,6 +97,7 @@ Route::middleware('auth')->controller(PlantMonitorController::class)->group(func
     Route::post('/plant/image','showImagePost')->name('monitor.monitor_post');
     Route::post('plantMonitor/addImage','imageAddPost')->name('monitor.add_plant_imagePost');
     Route::get('/getCollectionNames','getCollectionNames')->name('monitor.get_collection_names');
+    Route::post('/saveDetection','saveDetection')->name('monitor.save_detection');
 });
 
 

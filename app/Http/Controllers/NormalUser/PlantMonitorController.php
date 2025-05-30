@@ -184,13 +184,20 @@ class PlantMonitorController extends Controller
         $plant_monitors = Plant_Monitor::where('planted_by',$user->id)->latest()->limit(5)->get();
         $plants = [];
         foreach($plant_monitors as $monitor){
-            $image = Plant_Image::where('monitor_id',$monitor->id)->latest()->first()->image_path;
+            $latest_image = Plant_Image::where('monitor_id',$monitor->id)->latest()->first();
+            $disease_name = null;
+            if($latest_image && $latest_image->disease_detection_id) {
+                $disease = Disease_Detection::find($latest_image->disease_detection_id);
+                $disease_name = $disease ? $disease->disease_name : null;
+            }
             array_push($plants,[
                 "plantType"=>Plant::find($monitor->plant_id)->plant_type,
-                "image"=>"https://leafeye.eu-1.sharedwithexpose.com/" . $image,
+                "image"=>"https://leafeye.eu-1.sharedwithexpose.com/" . $latest_image->image_path,
                 "datePlanted" => Carbon::parse($monitor->date_planted)->format('F j, Y'),
                 'exact_time'=>  Carbon::parse($monitor->date_planted)->format('F j, Y H:i:s'),
                 'monitor_id'=>$monitor->id,
+                'disease_name' => $disease_name,
+                'collection_name'=>$monitor->collection_name,
             ]);
         }
         return response()->json(
@@ -203,13 +210,20 @@ class PlantMonitorController extends Controller
         $plant_monitors = Plant_Monitor::where('planted_by',$user->id)->latest()->get();
         $plants = [];
         foreach($plant_monitors as $monitor){
-            $image = Plant_Image::where('monitor_id',$monitor->id)->latest()->first()->image_path;
+            $latest_image = Plant_Image::where('monitor_id',$monitor->id)->latest()->first();
+            $disease_name = null;
+            if($latest_image && $latest_image->disease_detection_id) {
+                $disease = Disease_Detection::find($latest_image->disease_detection_id);
+                $disease_name = $disease ? $disease->disease_name : null;
+            }
             array_push($plants,[
                 "plantType"=>Plant::find($monitor->plant_id)->plant_type,
-                "image"=>"https://leafeye.eu-1.sharedwithexpose.com/" . $image,
+                "image"=>"https://leafeye.eu-1.sharedwithexpose.com/" . $latest_image->image_path,
                 "datePlanted" => Carbon::parse($monitor->date_planted)->format('F j, Y'),
                 'exact_time'=>  Carbon::parse($monitor->date_planted)->format('F j, Y H:i:s'),
                 'monitor_id'=>$monitor->id,
+                'disease_name' => $disease_name,
+                'collection_name'=>$monitor->collection_name,
             ]);
         }
         return response()->json(
@@ -232,6 +246,7 @@ class PlantMonitorController extends Controller
                 "datePlanted" => Carbon::parse($image->created_at)->format('F j, Y'),
                 "id"=>$image->id,
                 "disease"=>$disease_name,
+                "collection_name"=>$image->monitor->collection_name,
             ]);
         }
         return response()->json(
@@ -240,6 +255,108 @@ class PlantMonitorController extends Controller
     }
 
     function getCollectionNames(Request $request){
-        
+        try{
+            $validator = Validator::make($request->all(), [
+                'plant_id' => 'required|exists:plants,id'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $collections = Plant_Monitor::where('planted_by', Auth::user()->id)
+                ->where('plant_id', $request->plant_id)
+                ->with(['plant', 'images' => function($query) {
+                    $query->latest();
+                }])
+                ->get()
+                ->map(function($monitor) {
+                    $latest_image = $monitor->images->first();
+                    $disease_name = null;
+                    if($latest_image && $latest_image->disease_detection_id) {
+                        $disease = Disease_Detection::find($latest_image->disease_detection_id);
+                        $disease_name = $disease ? $disease->disease_name : null;
+                    }
+                    return [
+                        'id' => $monitor->id,
+                        'name' => $monitor->collection_name,
+                        'plant_type' => $monitor->plant->plant_type,
+                        'latest_disease' => $disease_name,
+                        'date_created' => Carbon::parse($monitor->created_at)->format('F j, Y')
+                    ];
+                })
+                ->values()
+                ->toArray();
+
+            return response()->json([
+                "collections" => $collections
+            ]);
+        } catch(Exception $e) {
+            return response()->json([
+                "error" => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    function saveDetection(Request $request){
+        try{
+            $validator = Validator::make($request->all(), [
+                'image' => 'required|image|max:2048',
+                'collection_name' => 'required|string',
+                'disease_id' => 'required|exists:disease__detections,id',
+                'plant_id' => 'required|exists:plants,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'error' => $validator->errors()->first()
+                ], 422);
+            }
+
+            DB::beginTransaction();
+
+            $image = $request->file('image');
+            $imagePath = $image->store("user_plants/{$request->username}", 'public');
+
+            // Find or create the monitor
+            $monitor = Plant_Monitor::firstOrCreate(
+                [
+                    'collection_name' => $request->collection_name,
+                    'planted_by' => Auth::user()->id
+                ],
+                [
+                    'plant_id' => $request->plant_id,
+                    'date_planted' => now(),
+                ]
+            );
+
+            // Save the image with the disease detection
+            $image_save = Plant_Image::create([
+                'monitor_id' => $monitor->id,
+                'image_path' => $imagePath,
+                'disease_detection_id' => $request->disease_id,
+                'date_taken' => now(),
+            ]);
+
+            if (!$image_save) {
+                DB::rollBack();
+                return response()->json([
+                    'error' => 'Failed to save image'
+                ], 500);
+            }
+
+            DB::commit();
+            return response()->json([
+                'success' => 'Detection saved successfully'
+            ]);
+
+        } catch(Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

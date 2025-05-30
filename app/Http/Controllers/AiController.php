@@ -98,6 +98,7 @@ class AiController extends Controller
                 $responseData['disease_id'] = $detection->id;
                 $responseData['image_path'] = $imagePath;
                 $responseData['success'] = true;
+                $responseData['plant_id'] = $plantType->id;
                 
                 DB::commit();
                 return response()->json($responseData);

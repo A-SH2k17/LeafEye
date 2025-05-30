@@ -6,9 +6,10 @@ import { useEffect,useState,useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/multilanguage";
 import axios from "axios";
+import { usePage } from "@inertiajs/react";
 
 export default function CropDiseaseDetection(){
-
+    const { auth } = usePage().props;
     const saveMounted = useRef(false);
 
     //multilanguage code
@@ -22,6 +23,7 @@ export default function CropDiseaseDetection(){
     const [detectionResult, setDetectionResult] = useState(null);
     const [error, setError] = useState(null);
     const [save,setSave] = useState(false);
+    const [diseaseId,setDiseaseId] = useState(null);
     
     const { data, setData, reset, errors } = useForm({
         image: null,
@@ -79,9 +81,11 @@ export default function CropDiseaseDetection(){
                     "confidence": response.data.confidence,
                     "recommendations": response.data.recommendations,
                     "description":response.data.description,
+                    "plant_id":response.data.plant_id,
                 }
                 console.log(detect);
                 console.log(prediction)
+                setDiseaseId(response.data.disease_id)
                 setDetectionResult(detect);
             } else {
                 setError(response.data.message || "Failed to detect disease");
@@ -95,23 +99,80 @@ export default function CropDiseaseDetection(){
     };
 
     //collection code
-    const collectionNames = [
-        {
-            "id":1,
-            "name":"test",
-        }
-    ]
+    const [collectionNames,setCollectionNames] =useState([])
 
     const [selectName,setSelectedName] = useState("");
-    const [newColl,setNewColl]=useState(true);
+    const [newColl,setNewColl]=useState(false);
+
+    const handleSave = async () => {
+        if (!selectName) {
+            alert('Please select or enter a collection name');
+            return;
+        }
+
+        if (!diseaseId) {
+            alert('No disease detection found. Please detect a disease first.');
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('image', data.image);
+            formData.append('collection_name', selectName);
+            formData.append('disease_id', diseaseId);
+            formData.append('plant_id', detectionResult.plant_id);
+            formData.append('username', auth.user.username);
+
+            console.log('Sending data:', {
+                collection_name: selectName,
+                disease_id: diseaseId,
+                plant_id: detectionResult.plant_id,
+                username: auth.user.username
+            });
+
+            const response = await axios.post(route('monitor.save_detection'), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            if (response.data.success) {
+                alert('Successfully saved to collection');
+                // Reset the form
+                setSelectedName('');
+                setNewColl(false);
+            } else {
+                alert(response.data.error || 'Failed to save to collection');
+            }
+        } catch (error) {
+            console.error('Error saving to collection:', error);
+            alert(error.response?.data?.error || 'Error saving to collection');
+        }
+    }
+
     useEffect(()=>{
         if(saveMounted.current){
-            //alert(save)
-        }else{
+            if(save && detectionResult?.plant_id){
+                const fetchData = async () => {
+                    try{
+                        const response = await axios.get(route('monitor.get_collection_names'), {
+                            params: {
+                                plant_id: detectionResult.plant_id
+                            }
+                        });
+                        console.log('Collections response:', response.data);
+                        setCollectionNames(response.data.collections);
+                    } catch(error) {
+                        console.error("Error fetching collections:", error);
+                        alert(error.response?.data?.error || 'Error fetching collections');
+                    }
+                }
+                fetchData();
+            }
+        } else {
             saveMounted.current = true;
         }
-        
-    },[save]);
+    }, [save, detectionResult?.plant_id]);
     return(
         <>
         <Head title="AI Crop Disease Diagnostic"  />
@@ -195,7 +256,78 @@ export default function CropDiseaseDetection(){
                                         <div className="bg-white p-6 rounded-lg shadow">
                                             <h3 className="text-xl font-bold mb-3">Detection Results</h3>
                                             
-                                            
+                                            <div className="mb-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                                            <p className="text-sm font-medium text-gray-700 mb-3">Existing Collection</p>
+                                            <div className="flex items-center space-x-6">
+                                                <div className="flex items-center">
+                                                    <input 
+                                                        type="radio" 
+                                                        name="existing" 
+                                                        id="existing_yes"
+                                                        checked={!newColl}
+                                                        onChange={() => setNewColl(false)}
+                                                        className="h-4 w-4 text-leaf-button-main focus:ring-leaf-button-main border-gray-300"
+                                                    />
+                                                    <label htmlFor="existing_yes" className="ml-2 text-sm text-gray-700">Yes</label>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <input 
+                                                        type="radio" 
+                                                        name="existing" 
+                                                        id="existing_no"
+                                                        checked={newColl}
+                                                        onChange={() => setNewColl(true)}
+                                                        className="h-4 w-4 text-leaf-button-main focus:ring-leaf-button-main border-gray-300"
+                                                    />
+                                                    <label htmlFor="existing_no" className="ml-2 text-sm text-gray-700">No</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        { newColl &&
+                                            <div className="mb-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                                                <label htmlFor="collection_name" className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Collection Name
+                                                </label>
+                                                <input
+                                                    id="collection_name"
+                                                    type="text"
+                                                    onChange={(e) => setSelectedName(e.target.value)}
+                                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-leaf-button-main focus:ring-leaf-button-main"
+                                                />
+                                                <button 
+                                                    type="submit" 
+                                                    className="mt-3 inline-flex items-center px-4 py-2 bg-leaf-button-main border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-leaf-button-200 focus:bg-leaf-button-200 active:bg-leaf-button-200 focus:outline-none focus:ring-2 focus:ring-leaf-button-main focus:ring-offset-2 transition ease-in-out duration-150"
+                                                    onClick={()=>handleSave()}
+                                                >
+                                                    Save Collection
+                                                </button>
+                                            </div>
+                                        }
+                                        {
+                                            !newColl &&
+                                            <div className="mb-4 p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                                                <label htmlFor="collections" className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Collection
+                                                </label>
+                                                <select 
+                                                    id="collections"
+                                                    name="collections" 
+                                                    onChange={(e) => setSelectedName(e.target.value)}
+                                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-leaf-button-main focus:ring-leaf-button-main"
+                                                >
+                                                    {collectionNames.map((name) => (
+                                                        <option key={name.id} value={name.name}>{name.name}</option>
+                                                    ))}
+                                                </select>
+                                                <button 
+                                                    type="submit" 
+                                                    className="mt-3 inline-flex items-center px-4 py-2 bg-leaf-button-main border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-leaf-button-200 focus:bg-leaf-button-200 active:bg-leaf-button-200 focus:outline-none focus:ring-2 focus:ring-leaf-button-main focus:ring-offset-2 transition ease-in-out duration-150"
+                                                    onClick={()=>handleSave()}
+                                                >
+                                                    Save to Collection
+                                                </button>
+                                            </div>
+                                        }
                                             <div className="mb-4">
                                                 <h4 className="font-medium mb-1">Plant Type:</h4>
                                                 <p className="text-lg">{detectionResult.plantType || 'Unknown'}</p>
@@ -234,28 +366,6 @@ export default function CropDiseaseDetection(){
                                         </div>
                                     ) : (
                                         <>
-                                        <div>
-                                            <p>Existing Collection</p>
-                                            <input type="radio" name="existing" id=""  onChange={()=>setNewColl(false)}/> <label className="mr-3">Yes</label>
-                                            <input type="radio" name="existing" id="" onChange={()=>setNewColl(true)}/> <label htmlFor="">No</label>
-                                        </div>
-                                        { newColl &&
-                                            <div>
-                                                <label className="mr-2">Collection Name</label>
-                                                <input type="text" onChange={(e)=>alert()}/>
-                                                <button type="submit">Save</button>
-                                            </div>
-                                        }
-                                        {
-                                            !newColl &&
-                                            <div className="mb-4">
-                                                    <h4 className="font-medium mb-1">Collection:</h4>
-                                                    <select name="collections" id="" onChange={(e)=>setSelectedName(e.target.value)}>{collectionNames.map((name)=>
-                                                        (<option id={name.id} value={name.name}>{name.name}</option>)
-                                                    )}</select>
-                                                    <button type="submit">Save</button>
-                                            </div>
-                                        }
                                             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
                                                 <p className="text-gray-500">Disease detection results will appear here</p>
                                             </div>

@@ -31,9 +31,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/plants_home',[App\Http\Controllers\NormalUser\PlantMonitorController::class,'getRecentPlantsApi']);
     Route::get('/plants_monitor',[App\Http\Controllers\NormalUser\PlantMonitorController::class,'getAllPlantsApi']);
     Route::post('/monitor_images',[App\Http\Controllers\NormalUser\PlantMonitorController::class,'getPlantImagesApi']);
+    Route::get('/getCollectionNames',[App\Http\Controllers\NormalUser\PlantMonitorController::class,'getCollectionNames']);
+    Route::post('/saveDetection',[App\Http\Controllers\NormalUser\PlantMonitorController::class,'saveDetection']);
 
     Route::post('/fertilizer_recommendation',[App\Http\Controllers\FertRecomController::class,'recommend']);
     Route::post('/disease_detection',[App\Http\Controllers\AiController::class,'detectDisease']);
+    
 
     Route::get('/chat/history', [AiController::class, 'getChatHistory']);
     Route::post('/chat/new', [AiController::class, 'createNewChat']);
