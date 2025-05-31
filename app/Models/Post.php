@@ -32,4 +32,21 @@ class Post extends Model
     public function postDeletion(){
         return $this->hasOne(Post_Deletion::class);
     }
+
+    public function reports()
+    {
+        return $this->hasMany(PostReport::class);
+    }
+
+    public function isReportedByUser($userId)
+    {
+        return $this->reports()->where('user_id', $userId)->exists();
+    }
+
+    public function scopeReported($query)
+    {
+        return $query->whereHas('reports')
+                    ->withCount('reports')
+                    ->orderBy('reports_count', 'desc');
+    }
 }

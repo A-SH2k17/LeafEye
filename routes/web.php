@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AdminController;
 
 Route::post('/test',function(){
     return 'yes';
@@ -73,6 +74,7 @@ Route::middleware('auth')->controller(FeedController::class)->group(function(){
     Route::post('/feed/{user}/{post}/like','like')->name('feed.user_like');
     Route::post('/feed/{user}/{post}/{content}/comment','comment')->name('feed.user_comment');
     Route::get('/getPosts','retrievePosts')->name('feed.getPosts');
+    Route::post('/feed/report/{user}/{post}','reportPost')->name('feed.report_post');
 });
 
 
@@ -169,6 +171,38 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('business.orders.index');
     Route::patch('/business/orders/{order}/status', [App\Http\Controllers\BusinessUser\OrderController::class, 'updateStatus'])
         ->name('business.orders.update-status');
+});
+
+// Admin Routes
+Route::prefix('admin')->group(function () {
+    Route::get('login', [AdminController::class, 'showLogin'])->name('admin.login');
+    Route::post('login', [AdminController::class, 'login']);
+    
+    // Protected admin routes
+    Route::middleware(['auth:admin'])->group(function () {
+        Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        Route::post('shop/decision', [AdminController::class, 'handleShopDecision'])->name('admin.shop.decision');
+        Route::delete('user/{id}', [AdminController::class, 'deleteUser'])->name('admin.user.delete');
+        Route::delete('post/{id}', [AdminController::class, 'deletePost'])->name('admin.post.delete');
+        Route::post('logout', [AdminController::class, 'logout'])->name('admin.logout');
+    });
+});
+
+// Business routes
+Route::middleware(['auth'])->group(function () {
+    // ... existing routes ...
+
+    // Business routes
+    Route::prefix('business')->group(function () {
+        Route::get('/pending', function () {
+            return Inertia::render('Business/PendingApproval', [
+                'status' => 'pending',
+                'reason' => null
+            ]);
+        })->name('business.pending');
+        
+        // ... other business routes ...
+    });
 });
 
 require __DIR__.'/auth.php';

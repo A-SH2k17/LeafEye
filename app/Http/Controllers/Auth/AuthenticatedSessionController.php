@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Shop;
 use App\Models\User;
+use App\Models\Admin_Shop_Decisions;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,11 +40,45 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
         $user = User::where('email', $request->email)->first();
         
+        // Update last login time
+        $user->updateLastLogin();
+        
         // Create token for API authentication
         $token = $user->createToken(time())->plainTextToken;
         
         // Redirect based on user type
         if ($user->role == "business") {
+            $shop = Shop::where('user_id', $user->id)->first();
+            
+            if ($shop) {
+                $decision = Admin_Shop_Decisions::where('shop_id', $shop->id)
+                    ->latest()
+                    ->first();
+
+                if (!$decision || $decision->decision === 'pending') {
+                    // Log out the user if shop is not accepted
+                    Auth::logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+                    
+                    return Inertia::render('Business/PendingApproval', [
+                        'status' => 'pending',
+                        'reason' => $decision ? $decision->reason_of_rejection : null
+                    ]);
+                }
+
+                if ($decision->decision === 'rejected') {
+                    // Log out the user if shop is rejected
+                    Auth::logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+                    
+                    return Inertia::render('Business/Rejected', [
+                        'reason' => $decision->reason_of_rejection
+                    ]);
+                }
+            }
+
             return Inertia::location(
                 route('business.dashboard', [
                     'csrfToken' => csrf_token(),

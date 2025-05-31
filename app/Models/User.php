@@ -27,6 +27,7 @@ class User extends Authenticatable
         'role',
         'email',
         'password',
+        'last_login',
     ];
 
     /**
@@ -49,9 +50,48 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_login' => 'datetime',
         ];
     }
 
+    /**
+     * Update the user's last login timestamp
+     */
+    public function updateLastLogin(): void
+    {
+        $this->update(['last_login' => now()]);
+    }
+
+    /**
+     * Get the formatted last login time
+     */
+    public function getLastLoginFormatted(): ?string
+    {
+        return $this->last_login ? $this->last_login->format('Y-m-d H:i:s') : 'Never';
+    }
+
+    /**
+     * Get the time elapsed since last login
+     */
+    public function getTimeSinceLastLogin(): ?string
+    {
+        if (!$this->last_login) {
+            return 'Never logged in';
+        }
+
+        $now = now();
+        $diff = $now->diff($this->last_login);
+
+        if ($diff->days > 0) {
+            return $diff->days . ' days ago';
+        } elseif ($diff->h > 0) {
+            return $diff->h . ' hours ago';
+        } elseif ($diff->i > 0) {
+            return $diff->i . ' minutes ago';
+        } else {
+            return 'Just now';
+        }
+    }
 
     public function posts(){
         return $this->hasMany(Post::class);

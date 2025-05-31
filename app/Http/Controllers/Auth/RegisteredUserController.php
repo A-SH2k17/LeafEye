@@ -33,7 +33,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): Response
     {
         $request->validate([
             'username' => 'required|string|max:255|unique:'.User::class,
@@ -70,16 +70,23 @@ class RegisteredUserController extends Controller
                 'type' => $request->storeType,
                 'user_id' => $user->id,
             ]);
-            return redirect(route('business.dashboard', [
+            
+            // Create token for API authentication
+            $token = $user->createToken(time())->plainTextToken;
+            
+            // Return the pending approval page directly
+            return Inertia::render('Business/PendingApproval', [
+                'status' => 'pending',
+                'reason' => null,
                 'csrfToken' => csrf_token(),
-                'bearer_token' => $user->createToken(time())->plainTextToken
-            ], absolute: false));
+                'bearer_token' => $token
+            ]);
         }
 
-        return redirect(route('users_home', [
+        return Inertia::render('AuthenticatedUsers/Dashboard', [
             'csrfToken' => csrf_token(),
             'bearer_token' => $user->createToken(time())->plainTextToken
-        ], absolute: false));
+        ]);
     }
 
 

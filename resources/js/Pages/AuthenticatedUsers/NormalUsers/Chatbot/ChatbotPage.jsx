@@ -218,32 +218,23 @@ export default function ChatbotPage() {
             <AuthenticatedLayout>
                 <div className="flex h-[calc(100vh-200px)] bg-white rounded-lg shadow-lg overflow-hidden pt-20">
                     {/* Chat History Sidebar */}
-                    <div className="w-1/4 border-r border-gray-200">
-                        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                            <h2 className="text-lg font-medium text-gray-900">Chat History</h2>
-                            <button
-                                onClick={startNewChat}
-                                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                                title="Start New Chat"
-                            >
-                                <Plus className="h-5 w-5 text-green-500" />
+                    <div className="flex flex-col h-full">
+                        <div className="flex items-center justify-between p-4 border-b">
+                            <h2 className="text-lg font-semibold">Chat History</h2>
+                            <button onClick={startNewChat} className="p-2 rounded-full hover:bg-gray-200">
+                                <Plus size={20} />
                             </button>
                         </div>
-                        <div className="overflow-y-auto h-full">
+                        <div className="flex-1 overflow-y-auto p-4">
                             {chatHistory.map((chat) => (
                                 <div
                                     key={chat.id}
-                                    className={`p-4 cursor-pointer hover:bg-gray-50 ${
-                                        selectedChat?.id === chat.id ? 'bg-green-50' : ''
-                                    }`}
                                     onClick={() => selectChat(chat)}
+                                    className={`p-3 mb-2 rounded-lg cursor-pointer ${selectedChat?.id === chat.id ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
                                 >
-                                    <h3 className="text-sm font-medium text-gray-900 truncate">
-                                        {chat.title}
-                                    </h3>
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        {new Date(chat.date_interacted).toLocaleString()}
-                                    </p>
+                                    <h3 className="font-medium">{chat.title}</h3>
+                                    <p className="text-sm text-gray-500">{chat.timestamp}</p>
+                                    <p className="text-sm truncate">{chat.preview}</p>
                                 </div>
                             ))}
                         </div>

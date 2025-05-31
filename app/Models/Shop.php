@@ -15,7 +15,15 @@ class Shop extends Model
         'name',
         'type',
         'address',
-        'user_id'
+        'user_id',
+        'description',
+        'location',
+        'phone_number',
+        'email',
+        'website',
+        'logo',
+        'cover_image',
+        'status',
     ];
 
     public function user(){
@@ -25,7 +33,7 @@ class Shop extends Model
    
 
     public function shopAdminDecision(){
-        return $this->hasOne(Admin_Shop_Decisions::class);
+        return $this->hasMany(Admin_Shop_Decisions::class);
     }
 
     public function product(){

@@ -1,6 +1,6 @@
 import React from "react";
 import PrimaryButton from "../Primitive/PrimaryButton";
-import { Heart, MessageSquare, X } from 'lucide-react';
+import { Heart, MessageSquare, X, Flag } from 'lucide-react';
 import { router } from "@inertiajs/react";
 import { useState } from "react";
 
@@ -13,6 +13,8 @@ export default function PostCard(props){
     const [commentActive, setCommentActive] = useState(false);
     const [comments, setComments] = useState(props.post.comments || [])
     const [userComment, setUserComment] = useState("")
+    const [reportCount, setReportCount] = useState(props.post.report_count || 0)
+    const [reportedByUser, setReportedByUser] = useState(props.post.reported_by_user || false)
     
     // Use the parent component's follow handler
     const followSwitch = () => {
@@ -79,6 +81,23 @@ export default function PostCard(props){
         setUserComment(e.target.value);
     }
     
+    //report api request
+    const handleReport = () => {
+        fetch(route("feed.report_post", {user: props.active_user_id, post: props.post.post_id}), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": localStorage.getItem("csrf_token")
+            },
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            setReportCount(data.report_count);
+            setReportedByUser(data.reported);
+        })
+        .catch((error) => console.error("Error:", error));
+    };
+    
     return(
         <div className="p-4 rounded-lg shadow-xl my-3 max-w-xl bg-[#e8fcef]">
             <div className="flex items-center">
@@ -104,12 +123,20 @@ export default function PostCard(props){
             <div className="p-4 bg-[#fafcff] rounded-md m-2">
                 <div className="flex items-center space-x-4 text-sm mb-2">
                     <div className="flex items-center">
-                    <Heart size={16} className="mr-1 text-black active:scale-125" fill={likedByUser ? "red" : "white"} onClick={likeSwitch}/>
-                    <span>{likeCounts}</span>
+                        <Heart size={16} className="mr-1 text-black active:scale-125" fill={likedByUser ? "red" : "white"} onClick={likeSwitch}/>
+                        <span>{likeCounts}</span>
                     </div>
                     <div className="flex items-center">
-                    <MessageSquare size={16} className="mr-1 text-black active:scale-125" onClick={commentSwitch}/>
-                    <span>{commentCounts}</span>
+                        <MessageSquare size={16} className="mr-1 text-black active:scale-125" onClick={commentSwitch}/>
+                        <span>{commentCounts}</span>
+                    </div>
+                    <div className="flex items-center">
+                        <Flag 
+                            size={16} 
+                            className={`mr-1 text-black active:scale-125 cursor-pointer ${reportedByUser ? 'text-red-500' : ''}`} 
+                            onClick={handleReport}
+                        />
+                        <span>{reportCount}</span>
                     </div>
                 </div>    
                 <div className="mb-3">

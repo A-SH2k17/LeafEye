@@ -177,4 +177,28 @@ class FeedController extends Controller
             ],500);
         }
     }
+
+    public function reportPost(Request $request, $userId, $postId)
+    {
+        $post = Post::findOrFail($postId);
+        
+        // Check if user has already reported this post
+        if ($post->isReportedByUser($userId)) {
+            // Remove the report
+            $post->reports()->where('user_id', $userId)->delete();
+            $reported = false;
+        } else {
+            // Add the report
+            $post->reports()->create([
+                'user_id' => $userId,
+                'reported_at' => now()
+            ]);
+            $reported = true;
+        }
+
+        return response()->json([
+            'report_count' => $post->reports()->count(),
+            'reported' => $reported
+        ]);
+    }
 }
