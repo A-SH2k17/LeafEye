@@ -162,4 +162,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/messages', [MessagesController::class, 'store']);
 });
 
+// Business User Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Order Management Routes
+    Route::get('/business/orders', [App\Http\Controllers\BusinessUser\OrderController::class, 'index'])
+        ->name('business.orders.index');
+    Route::patch('/business/orders/{order}/status', [App\Http\Controllers\BusinessUser\OrderController::class, 'updateStatus'])
+        ->name('business.orders.update-status');
+});
+
 require __DIR__.'/auth.php';

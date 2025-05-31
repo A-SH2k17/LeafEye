@@ -203,8 +203,28 @@ export default function BusinessDashboard({success,errors,auth,shop,products}) {
             <div className='p-4'>
                 {shop ? (
                     <>
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">{shop.name} - Inventory Management</h1>
-                <h2 className='text-xl sm:2xl md:3xl font-semibold'>{shop.type}</h2>
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">{shop.name} - Inventory Management</h1>
+                        <h2 className='text-xl sm:2xl md:3xl font-semibold'>{shop.type}</h2>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <Link
+                            href={route('business.add_product')}
+                            className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add Product
+                        </Link>
+                        <Link
+                            href={route('business.orders.index')}
+                            className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150"
+                        >
+                            <Package className="w-4 h-4 mr-2" />
+                            View Orders
+                        </Link>
+                    </div>
+                </div>
                     </>
                 ) : (
                     <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">Welcome to Business Dashboard</h1>

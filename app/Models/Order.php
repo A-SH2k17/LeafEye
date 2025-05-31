@@ -13,10 +13,11 @@ class Order extends Model
 
     protected $fillable=[
         'date_ordered',
-        'user_id'
+        'user_id',
+        'status'
     ];
 
-    public function users(){
+    public function user(){
         return $this->belongsTo(User::class);
     }
 
