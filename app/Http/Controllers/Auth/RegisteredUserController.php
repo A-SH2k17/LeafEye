@@ -33,7 +33,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): Response
+    public function store(Request $request)
     {
         $request->validate([
             'username' => 'required|string|max:255|unique:'.User::class,
@@ -82,11 +82,13 @@ class RegisteredUserController extends Controller
                 'bearer_token' => $token
             ]);
         }
-
-        return Inertia::render('AuthenticatedUsers/Dashboard', [
-            'csrfToken' => csrf_token(),
-            'bearer_token' => $user->createToken(time())->plainTextToken
-        ]);
+        $token = $user->createToken(time())->plainTextToken;
+        return Inertia::location(
+            route('users_home', [
+                'csrfToken' => csrf_token(),
+                'bearer_token' => $token
+            ])
+        );
     }
 
 

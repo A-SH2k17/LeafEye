@@ -115,13 +115,16 @@ export default function Dashboard(props) {
 
             <div className="flex p-2">
                 <h1 className="text-2xl sm:text-2xl md:text-3xl mr-4">{t("colllection_title")}</h1>
+                {/*
                 <PrimaryButton><Link
                     href={`/plantMonitor/${props.auth.user.username}/addPlant`}
                 >{t("add_plant_button")}</Link></PrimaryButton>
+                */}
+                
             </div>
             { plants.length==0&&
                 <div className="flex justify-center">
-                    <h1 className='p-5'> You currently monitor no plants in your collection....</h1>
+                    <h1 className='p-5'> You currently monitor no plants....</h1>
                 </div>
             }
             {

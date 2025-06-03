@@ -44,8 +44,8 @@ class FollowerController extends Controller
 
             if($followers_db->isEmpty()){
                 return response()->json([
-                    "error"=>"No followers Found",
-                ],500);
+                    'followers'=>[],
+                ]);
             }
 
             foreach($followers_db as $follower){

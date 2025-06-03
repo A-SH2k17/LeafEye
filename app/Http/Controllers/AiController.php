@@ -21,8 +21,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse; // Add this import
 
 class AiController extends Controller
 {
-    function disease_index(){
-        return Inertia::render('AuthenticatedUsers/NormalUsers/AI/CropDiseaseDetection');
+    function disease_index(Request $request){
+        return Inertia::render('AuthenticatedUsers/NormalUsers/AI/CropDiseaseDetection',['collection' => $request->get('collection'),'user' => $request->get('user')]);
     }
 
     public function test(Request $request){

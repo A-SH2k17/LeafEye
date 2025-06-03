@@ -3,6 +3,8 @@ import { Send, Bot, User, Plus } from 'lucide-react';
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Footer from '@/Components/NonPrimitive/Footer';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/multilanguage';
 
 // Sample data for demonstration
 const sampleChatHistory = [
@@ -211,6 +213,9 @@ export default function ChatbotPage() {
             abortControllerRef.current = null;
         }
     };
+    
+    const {lang,handleChange,languages} = useLanguage();
+    const {t} = useTranslation();
 
     return (
         <>
@@ -220,7 +225,7 @@ export default function ChatbotPage() {
                     {/* Chat History Sidebar */}
                     <div className="flex flex-col h-full">
                         <div className="flex items-center justify-between p-4 border-b">
-                            <h2 className="text-lg font-semibold">Chat History</h2>
+                            <h2 className="text-lg font-semibold">{t("chat_history")}</h2>
                             <button onClick={startNewChat} className="p-2 rounded-full hover:bg-gray-200">
                                 <Plus size={20} />
                             </button>
@@ -247,17 +252,10 @@ export default function ChatbotPage() {
                             <div className="flex items-center space-x-3">
                                 <Bot className="h-8 w-8 text-green-500" />
                                 <h2 className="text-lg font-medium text-gray-900">
-                                    {selectedChat ? selectedChat.title : 'New Chat'}
+                                    {selectedChat ? selectedChat.title : t("new_chat")}
                                 </h2>
                             </div>
-                            {selectedChat && (
-                                <button
-                                    onClick={startNewChat}
-                                    className="px-4 py-2 text-sm text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors duration-200"
-                                >
-                                    Start New Chat
-                                </button>
-                            )}
+                            
                         </div>
 
                         {/* Messages */}
@@ -266,8 +264,8 @@ export default function ChatbotPage() {
                                 <div className="flex items-center justify-center h-full">
                                     <div className="text-center text-gray-500">
                                         <Bot className="h-12 w-12 mx-auto mb-4 text-green-500" />
-                                        <h3 className="text-lg font-medium mb-2">Start a New Conversation</h3>
-                                        <p className="text-sm">Ask me anything about plant care!</p>
+                                        <h3 className="text-lg font-medium mb-2">{t("text_welcome")}</h3>
+                                        <p className="text-sm">{t("chat_ask")}</p>
                                     </div>
                                 </div>
                             )}

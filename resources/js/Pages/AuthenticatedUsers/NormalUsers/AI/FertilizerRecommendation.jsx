@@ -247,7 +247,6 @@ export default function FertilizerRecommendation(props) {
                             </div>
                         )}
                     </div>
-                    <button onClick={()=>{console.log(recommendation)}}>dfa</button>
                 </div>
                 <Footer lang={lang}/>
             </AuthenticatedLayout>

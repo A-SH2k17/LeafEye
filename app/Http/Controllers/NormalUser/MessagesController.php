@@ -25,8 +25,8 @@ class MessagesController extends Controller
 
             if($messages_db->isEmpty()){
                 return response()->json([
-                    "error"=>"No Messages Found",
-                ],500);
+                    "messages" => [],
+                ]);
             }
 
             foreach($messages_db as $message){
