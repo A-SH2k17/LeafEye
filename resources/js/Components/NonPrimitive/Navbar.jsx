@@ -123,7 +123,7 @@ export default function Navbar({lang,user}){
                                             <PrimaryButton className="mr-4">{t("register")}</PrimaryButton>
                                         </Link>
                                         <Link href={route('login')}>
-                                            <PrimaryButton>{t("login")}</PrimaryButton>
+                                            <PrimaryButton id="login">{t("login")}</PrimaryButton>
                                         </Link>
                                     </div>
                                     </>

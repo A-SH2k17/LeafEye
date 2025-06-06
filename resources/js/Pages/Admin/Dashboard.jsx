@@ -1,13 +1,31 @@
 import { Head, Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 
-export default function Dashboard({ pendingShops, reportedPosts, users }) {
+export default function Dashboard({ pendingShops, reportedPosts, users, success, error }) {
     const [activeTab, setActiveTab] = useState('shops');
     const [rejectionReason, setRejectionReason] = useState('');
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [selectedShopId, setSelectedShopId] = useState(null);
     const [selectedReportedPost, setSelectedReportedPost] = useState(null);
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertType, setAlertType] = useState('success');
+
+    useEffect(() => {
+        if (success || error) {
+            setShowAlert(true);
+            setAlertMessage(success || error);
+            setAlertType(success ? 'success' : 'error');
+            
+            // Hide alert after 5 seconds
+            const timer = setTimeout(() => {
+                setShowAlert(false);
+            }, 5000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [success, error]);
 
     const handleShopDecision = (shopId, decision) => {
         if (decision === 'rejected') {
@@ -20,12 +38,25 @@ export default function Dashboard({ pendingShops, reportedPosts, users }) {
             shop_id: shopId,
             decision: decision,
             reason_of_rejection: null
+        }, {
+            onSuccess: () => {
+                setShowAlert(true);
+                setAlertMessage('Decision saved and notification email sent successfully');
+                setAlertType('success');
+            },
+            onError: (errors) => {
+                setShowAlert(true);
+                setAlertMessage('Failed to process decision: ' + (errors.message || 'Unknown error'));
+                setAlertType('error');
+            }
         });
     };
 
     const handleRejectConfirm = () => {
         if (!rejectionReason.trim()) {
-            alert('Please provide a reason for rejection');
+            setShowAlert(true);
+            setAlertMessage('Please provide a reason for rejection');
+            setAlertType('error');
             return;
         }
 
@@ -33,11 +64,21 @@ export default function Dashboard({ pendingShops, reportedPosts, users }) {
             shop_id: selectedShopId,
             decision: 'rejected',
             reason_of_rejection: rejectionReason
+        }, {
+            onSuccess: () => {
+                setShowAlert(true);
+                setAlertMessage('Decision saved and notification email sent successfully');
+                setAlertType('success');
+                setShowRejectModal(false);
+                setRejectionReason('');
+                setSelectedShopId(null);
+            },
+            onError: (errors) => {
+                setShowAlert(true);
+                setAlertMessage('Failed to process decision: ' + (errors.message || 'Unknown error'));
+                setAlertType('error');
+            }
         });
-
-        setShowRejectModal(false);
-        setRejectionReason('');
-        setSelectedShopId(null);
     };
 
     const deleteUser = (userId) => {
@@ -80,6 +121,30 @@ export default function Dashboard({ pendingShops, reportedPosts, users }) {
                         </div>
                     </div>
                 </div>
+
+                {/* Alert Message */}
+                {showAlert && (
+                    <div className={`fixed top-4 right-4 p-4 rounded-md shadow-lg ${
+                        alertType === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                    }`}>
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                {alertType === 'success' ? (
+                                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                ) : (
+                                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                    </svg>
+                                )}
+                            </div>
+                            <div className="ml-3">
+                                <p className="text-sm font-medium">{alertMessage}</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Main Content */}
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">

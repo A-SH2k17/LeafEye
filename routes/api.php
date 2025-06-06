@@ -42,6 +42,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat/new', [AiController::class, 'createNewChat']);
     Route::post('/chat/update/{chatId}', [AiController::class, 'updateChat']);
     Route::post('/chat/generate', [AiController::class, 'generateChat']);
+
+    Route::get('/business/orders', [App\Http\Controllers\BusinessUser\OrderController::class, 'apiIndex']);
+    Route::patch('/business/orders/{order}/status', [App\Http\Controllers\BusinessUser\OrderController::class, 'apiUpdateStatus']);
 });
 //registration api
 Route::controller(RegisteredUserController::class)->group(function(){

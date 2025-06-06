@@ -35,60 +35,75 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'username' => 'required|string|max:255|unique:'.User::class,
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'location' => 'required|string|max:1000',
-            'phone_number' => 'required|regex:/(01)[0-9]{9}/',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'customerType' => 'required|in:normal,business',
-        ]);
-
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name'=>$request->last_name,
-            'location' =>$request->location,
-            'phone_number'=>$request->phone_number,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role'=>$request->customerType,
-            'username'=>$request->username,
-        ]);
-
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        // Redirect based on user type
-        if ($request->customerType === 'business') {
-            $shop = Shop::create([
-                'name' => $request->storeName,
-                'address' => $request->storeAddress,
-                'commercial_registration' => $request->commercialRegistrationNumber,
-                'type' => $request->storeType,
-                'user_id' => $user->id,
+        DB::beginTransaction();
+        try {
+            $request->validate([
+                'username' => 'required|string|max:255|unique:'.User::class,
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'location' => 'required|string|max:1000',
+                'phone_number' => 'required|regex:/(01)[0-9]{9}/',
+                'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+                'password' => ['required', 'confirmed', Rules\Password::defaults()],
+                'customerType' => 'required|in:normal,business',
             ]);
-            
-            // Create token for API authentication
+
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'last_name'=>$request->last_name,
+                'location' =>$request->location,
+                'phone_number'=>$request->phone_number,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role'=>$request->customerType,
+                'username'=>$request->username,
+            ]);
+
+            event(new Registered($user));
+
+            Auth::login($user);
+
+            // Redirect based on user type
+            if ($request->customerType === 'business') {
+                $shop = Shop::create([
+                    'name' => $request->storeName,
+                    'address' => $request->storeAddress,
+                    'commercial_registration' => $request->commercialRegistrationNumber,
+                    'type' => $request->storeType,
+                    'user_id' => $user->id,
+                ]);
+                
+                // Create token for API authentication
+                $token = $user->createToken(time())->plainTextToken;
+                
+                DB::commit();
+                
+                // Return the pending approval page directly
+                return Inertia::render('Business/PendingApproval', [
+                    'status' => 'pending',
+                    'reason' => null,
+                    'csrfToken' => csrf_token(),
+                    'bearer_token' => $token
+                ]);
+            }
+
             $token = $user->createToken(time())->plainTextToken;
             
-            // Return the pending approval page directly
-            return Inertia::render('Business/PendingApproval', [
-                'status' => 'pending',
-                'reason' => null,
-                'csrfToken' => csrf_token(),
-                'bearer_token' => $token
+            DB::commit();
+            
+            return Inertia::location(
+                route('users_home', [
+                    'csrfToken' => csrf_token(),
+                    'bearer_token' => $token
+                ])
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors([
+                'error' => 'Registration failed. Please try again.',
+                'details' => $e->getMessage()
             ]);
         }
-        $token = $user->createToken(time())->plainTextToken;
-        return Inertia::location(
-            route('users_home', [
-                'csrfToken' => csrf_token(),
-                'bearer_token' => $token
-            ])
-        );
     }
 
 

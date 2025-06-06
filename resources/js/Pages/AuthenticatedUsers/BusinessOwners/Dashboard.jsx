@@ -255,7 +255,7 @@ export default function BusinessDashboard({success,errors,auth,shop,products}) {
                     </div>
                     <div>
                     <h3 className="text-gray-500 text-sm">Total Sales</h3>
-                    <p className="text-2xl font-bold">${totalSales.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">EGP {totalSales.toLocaleString()}</p>
                     <p className="text-green-600 text-sm flex items-center">
                         <TrendingUp size={14} className="mr-1" />
                         +12.5% from last period
@@ -271,7 +271,7 @@ export default function BusinessDashboard({success,errors,auth,shop,products}) {
                     </div>
                     <div>
                     <h3 className="text-gray-500 text-sm">Inventory Value</h3>
-                    <p className="text-2xl font-bold">${totalInventoryValue.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">EGP {totalInventoryValue.toLocaleString()}</p>
                     <p className="text-sm text-gray-500">Across {inventoryData.length} products</p>
                     </div>
                 </div>
@@ -318,7 +318,7 @@ export default function BusinessDashboard({success,errors,auth,shop,products}) {
                 <YAxis stroke="#6b7280" />
                 <Tooltip 
                     contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
-                    formatter={(value) => [`$${value.toLocaleString()}`, 'Sales']}
+                    formatter={(value) => [`EGP ${value.toLocaleString()}`, 'Sales']}
                 />
                 <Line 
                     type="monotone" 
@@ -382,8 +382,8 @@ export default function BusinessDashboard({success,errors,auth,shop,products}) {
                 </div>
               </div>
             </td>
-            <td className="p-4 text-center">${item.price}</td>
-            <td className="p-4 text-center">${(item.quantity * item.price).toLocaleString()}</td>
+            <td className="p-4 text-center">EGP {item.price}</td>
+            <td className="p-4 text-center">EGP {(item.quantity * item.price).toLocaleString()}</td>
             <td className="p-4">
               <div className="flex justify-center space-x-2">
                 <PrimaryButton onClick={()=>{handleUpdate(item.id,item.quantity,item.name)}}>

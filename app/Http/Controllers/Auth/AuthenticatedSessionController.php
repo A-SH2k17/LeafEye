@@ -109,7 +109,7 @@ class AuthenticatedSessionController extends Controller
             }
             // Create token for API authentication
             $token = $user->createToken(time())->plainTextToken;
-            $shop = Shop::where('user_id',$user->id);
+            $shop = Shop::where('user_id',$user->id)->first();
             return response()->json([
                 'user' => $user,
                 'token' => $token,
