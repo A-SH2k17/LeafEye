@@ -110,11 +110,17 @@ class AuthenticatedSessionController extends Controller
             // Create token for API authentication
             $token = $user->createToken(time())->plainTextToken;
             $shop = Shop::where('user_id',$user->id)->first();
+            $status = null;
+            if($shop){
+                $decision = Admin_Shop_Decisions::where('shop_id',$shop->id)->first();
+                $status = $decision ? $decision->decision : "pending";
+            }
             return response()->json([
                 'user' => $user,
                 'token' => $token,
                 'shop' => $shop,
-                'message' => 'User Logged successfully'
+                'message' => 'User Logged successfully',
+                'shop_status' => $status,
             ], 201);
 
        }catch(Exception $e){

@@ -238,8 +238,10 @@ class PlantMonitorController extends Controller
         foreach($plant_images as $image){
             $disease = Disease_Detection::find($image->disease_detection_id);
             $disease_name = null;
+            $disease_treatment = null;
             if($disease){
                 $disease_name = $disease->disease_name;
+                $disease_treatment = $disease->treatment;
             }
             array_push($plants,[
                 "image"=>"https://leafeye.eu-1.sharedwithexpose.com/" . $image->image_path,
@@ -247,6 +249,7 @@ class PlantMonitorController extends Controller
                 "id"=>$image->id,
                 "disease"=>$disease_name,
                 "collection_name"=>$image->monitor->collection_name,
+                "treatment"=>$disease_treatment,
             ]);
         }
         return response()->json(

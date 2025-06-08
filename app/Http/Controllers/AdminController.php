@@ -83,13 +83,19 @@ class AdminController extends Controller
                     'last_login' => $user->getLastLoginFormatted(),
                     'time_since_login' => $user->getTimeSinceLastLogin(),
                     'shop_name' => $user->shops ? $user->shops->name : null,
+                    'account_status' => $user->account_status,
+                    'first_name' => $user->first_name,
+                    'last_name' => $user->last_name,
+                    'updated_at' => $user->updated_at,
                 ];
             });
 
         return Inertia::render('Admin/Dashboard', [
             'pendingShops' => $pendingShops,
             'reportedPosts' => $reportedPosts,
-            'users' => $users
+            'users' => $users,
+            'success' => session('success'),
+            'error' => session('error')
         ]);
     }
 
@@ -108,9 +114,13 @@ class AdminController extends Controller
 
     public function deleteUser($id)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
-        return back()->with('success', 'User deleted successfully');
+        try {
+            $user = User::findOrFail($id);
+            $user->update(['account_status' => 'deleted']);
+            return back()->with('success', 'User account has been deleted successfully.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to delete user account. Please try again.']);
+        }
     }
 
     public function deletePost($id)

@@ -145,7 +145,7 @@ class RegisteredUserController extends Controller
             ]);
 
             $shop = null;
-
+            $status = "active";
             if($request->customerType=="business"){
                 $shop = Shop::create([
                     'name' => $request->storeName,
@@ -154,6 +154,7 @@ class RegisteredUserController extends Controller
                     'type' => $request->storeType,
                     'user_id' => $user->id,
                 ]);
+                $status = "pending";
             }
             // Generate token
             $token = $user->createToken(time())->plainTextToken;
@@ -164,7 +165,8 @@ class RegisteredUserController extends Controller
                 'user' => $user,
                 'token' => $token,
                 'shop' => $shop,
-                'message' => 'User registered successfully'
+                'message' => 'User registered successfully',
+                'shop_status' => $status
             ], 200);
         }catch(Exception $e){
             DB::rollBack();

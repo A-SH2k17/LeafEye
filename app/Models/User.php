@@ -28,6 +28,7 @@ class User extends Authenticatable
         'email',
         'password',
         'last_login',
+        'account_status',
     ];
 
     /**
@@ -157,4 +158,9 @@ class User extends Authenticatable
     // {
     //     return $this->belongsToMany(User::class, 'follows', 'followed_by', 'user');
     // }
+
+    public function canLogin(): bool
+    {
+        return $this->account_status !== 'deleted';
+    }
 }

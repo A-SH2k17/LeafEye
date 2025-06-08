@@ -9,12 +9,13 @@ import { useRef, useState } from 'react';
 
 export default function DeleteUserForm({ className = '' }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const passwordInput = useRef();
 
     const {
         data,
         setData,
-        delete: destroy,
+        post,
         processing,
         reset,
         errors,
@@ -27,12 +28,17 @@ export default function DeleteUserForm({ className = '' }) {
         setConfirmingUserDeletion(true);
     };
 
-    const deleteUser = (e) => {
+    const requestAccountDeletion = (e) => {
         e.preventDefault();
 
-        destroy(route('profile.destroy'), {
+        post(route('profile.request-deletion'), {
+            password: data.password,
             preserveScroll: true,
-            onSuccess: () => closeModal(),
+            onSuccess: () => {
+                closeModal();
+                setShowSuccessMessage(true);
+                setTimeout(() => setShowSuccessMessage(false), 5000);
+            },
             onError: () => passwordInput.current.focus(),
             onFinish: () => reset(),
         });
@@ -40,7 +46,6 @@ export default function DeleteUserForm({ className = '' }) {
 
     const closeModal = () => {
         setConfirmingUserDeletion(false);
-
         clearErrors();
         reset();
     };
@@ -49,32 +54,38 @@ export default function DeleteUserForm({ className = '' }) {
         <section className={`space-y-6 ${className}`}>
             <header>
                 <h2 className="text-lg font-medium text-gray-900">
-                    Delete Account
+                    Request Account Deletion
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Once your account is deleted, all of its resources and data
-                    will be permanently deleted. Before deleting your account,
-                    please download any data or information that you wish to
-                    retain.
+                    Once your account deletion request is approved by an administrator,
+                    all of its resources and data will be permanently deleted. Before
+                    requesting deletion, please download any data or information that
+                    you wish to retain.
                 </p>
             </header>
 
+            {showSuccessMessage && (
+                <div className="bg-green-50 border border-green-200 text-green-800 rounded-md p-4">
+                    Your account deletion request has been submitted. An administrator will review your request.
+                </div>
+            )}
+
             <DangerButton onClick={confirmUserDeletion}>
-                Delete Account
+                Request Account Deletion
             </DangerButton>
 
             <Modal show={confirmingUserDeletion} onClose={closeModal}>
-                <form onSubmit={deleteUser} className="p-6">
+                <form onSubmit={requestAccountDeletion} className="p-6">
                     <h2 className="text-lg font-medium text-gray-900">
-                        Are you sure you want to delete your account?
+                        Are you sure you want to request account deletion?
                     </h2>
 
                     <p className="mt-1 text-sm text-gray-600">
-                        Once your account is deleted, all of its resources and
-                        data will be permanently deleted. Please enter your
-                        password to confirm you would like to permanently delete
-                        your account.
+                        Your account deletion request will be reviewed by an administrator.
+                        Once approved, all of your account's resources and data will be
+                        permanently deleted. Please enter your password to confirm your
+                        deletion request.
                     </p>
 
                     <div className="mt-6">
@@ -110,7 +121,7 @@ export default function DeleteUserForm({ className = '' }) {
                         </SecondaryButton>
 
                         <DangerButton className="ms-3" disabled={processing}>
-                            Delete Account
+                            Request Deletion
                         </DangerButton>
                     </div>
                 </form>

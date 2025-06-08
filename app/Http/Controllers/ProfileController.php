@@ -60,4 +60,20 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    public function requestDeletion(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+        
+        try {
+            $user->update(['account_status' => 'requested_to_delete']);
+            return back()->with('status', 'deletion-requested');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Failed to update account status. Please try again.']);
+        }
+    }
 }
